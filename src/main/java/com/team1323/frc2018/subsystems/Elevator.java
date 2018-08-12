@@ -8,6 +8,7 @@ import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
 import com.team1323.frc2018.loops.Loop;
 import com.team1323.frc2018.loops.Looper;
+import com.team254.drivers.TalonSRXFactory;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -55,20 +56,22 @@ public class Elevator extends Subsystem{
 	}
 	
 	private Elevator(){
+		//master = TalonSRXFactory.createDefaultTalon(Ports.ELEVATOR_1);
+		//motor2 = TalonSRXFactory.createPermanentSlaveTalon(Ports.ELEVATOR_2, Ports.ELEVATOR_1);
+		//motor3 = TalonSRXFactory.createPermanentSlaveTalon(Ports.ELEVATOR_3, Ports.ELEVATOR_1);
 		master = new TalonSRX(Ports.ELEVATOR_1);
 		motor2 = new TalonSRX(Ports.ELEVATOR_2);
 		motor3 = new TalonSRX(Ports.ELEVATOR_3);
+
+		motor2.set(ControlMode.Follower, Ports.ELEVATOR_1);
+		motor3.set(ControlMode.Follower, Ports.ELEVATOR_1);
 		
 		shifter = new Solenoid(20, Ports.ELEVATOR_SHIFTER);
 		latch = new Solenoid(20, Ports.ELEVATOR_RELEASE_PISTON);
 		gasStruts = new Solenoid(20, Ports.GAS_STRUTS);
 		
 		master.configVoltageCompSaturation(12.0, 10);
-		motor2.configVoltageCompSaturation(12.0, 10);
-		motor3.configVoltageCompSaturation(12.0, 10);
 		master.enableVoltageCompensation(true);
-		motor2.enableVoltageCompensation(true);
-		motor3.enableVoltageCompensation(true);
 		
 		master.setInverted(true);
 		motor2.setInverted(true);
@@ -84,18 +87,11 @@ public class Elevator extends Subsystem{
 		
 		setCurrentLimit(Constants.kELevatorCurrentLimit);
 		
-		master.configClosedloopRamp(0.0, 10);
-		motor2.configClosedloopRamp(0.0, 10);
-		motor3.configClosedloopRamp(0.0, 10);
-		
 		//resetToAbsolutePosition();
 		master.setNeutralMode(NeutralMode.Brake);
 		motor2.setNeutralMode(NeutralMode.Brake);
 		motor3.setNeutralMode(NeutralMode.Brake);
 		configForLifting();
-		master.set(ControlMode.PercentOutput, 0.0);
-		motor2.set(ControlMode.Follower, Ports.ELEVATOR_1);
-		motor3.set(ControlMode.Follower, Ports.ELEVATOR_1);
 	}
 	
 	private void setHighGear(boolean high){
@@ -331,12 +327,10 @@ public class Elevator extends Subsystem{
 	}
 	
 	public int feetToEncUnits(double feet){
-		//TODO
 		return (int) (feet * Constants.kElevatorTicksPerFoot);
 	}
 	
 	public double encUnitsToFeet(int encUnits){
-		//TODO
 		return encUnits / Constants.kElevatorTicksPerFoot;
 	}
 	
@@ -401,11 +395,11 @@ public class Elevator extends Subsystem{
 	@Override
 	public void outputToSmartDashboard() {
 		SmartDashboard.putNumber("Elevator 1 Current", master.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator 2 Current", motor2.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator 3 Current", motor3.getOutputCurrent());
+		//SmartDashboard.putNumber("Elevator 2 Current", motor2.getOutputCurrent());
+		//SmartDashboard.putNumber("Elevator 3 Current", motor3.getOutputCurrent());
 		SmartDashboard.putNumber("Elevator Voltage", master.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Elevator 2 Voltage", motor2.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Elevator 3 Voltage", motor3.getMotorOutputVoltage());
+		//SmartDashboard.putNumber("Elevator 2 Voltage", motor2.getMotorOutputVoltage());
+		//SmartDashboard.putNumber("Elevator 3 Voltage", motor3.getMotorOutputVoltage());
 		SmartDashboard.putNumber("Elevator Height", /*Math.round(getHeight()*1000.0)/1000.0*/getHeight());
 		//SmartDashboard.putNumber("Elevator Height Graph", getHeight());
 		//SmartDashboard.putNumber("Elevator Pulse Width Position", master.getSensorCollection().getPulseWidthPosition());

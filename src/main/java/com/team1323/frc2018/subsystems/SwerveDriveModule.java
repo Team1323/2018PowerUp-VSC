@@ -9,6 +9,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.lib.util.Util;
+import com.team254.drivers.TalonSRXFactory;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -32,6 +33,8 @@ public class SwerveDriveModule extends Subsystem{
 	
 	public SwerveDriveModule(int rotationSlot, int driveSlot, int moduleID, 
 			int encoderOffset, Translation2d startingPose){
+		//rotationMotor = TalonSRXFactory.createDefaultTalon(rotationSlot);
+		//driveMotor = TalonSRXFactory.createDefaultTalon(driveSlot);
 		rotationMotor = new TalonSRX(rotationSlot);
 		driveMotor = new TalonSRX(driveSlot);
 		configureMotors();
@@ -76,12 +79,9 @@ public class SwerveDriveModule extends Subsystem{
     	rotationMotor.setSensorPhase(true);
     	rotationMotor.setInverted(false);
     	rotationMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
-    	rotationMotor.enableVoltageCompensation(true);
     	rotationMotor.setNeutralMode(NeutralMode.Brake);
-    	rotationMotor.configVoltageCompSaturation(7.0, 10);
-    	rotationMotor.configNominalOutputForward(0.0, 10);
-    	rotationMotor.configNominalOutputReverse(0.0, 10);
-    	rotationMotor.enableCurrentLimit(false);
+		rotationMotor.configVoltageCompSaturation(7.0, 10);
+		rotationMotor.enableVoltageCompensation(true);
     	rotationMotor.configAllowableClosedloopError(0, 0, 10);
     	rotationMotor.configMotionAcceleration((int)(Constants.kSwerveRotationMaxSpeed*12.5), 10);
     	rotationMotor.configMotionCruiseVelocity((int)(Constants.kSwerveRotationMaxSpeed), 10);
@@ -98,8 +98,6 @@ public class SwerveDriveModule extends Subsystem{
     	driveMotor.configVelocityMeasurementWindow(32, 10);
     	driveMotor.configNominalOutputForward(1.5/12.0, 10);
     	driveMotor.configNominalOutputReverse(-1.5/12.0, 10);
-    	driveMotor.configPeakOutputForward(1.0, 10);
-    	driveMotor.configPeakOutputReverse(-1.0, 10);
     	driveMotor.configVoltageCompSaturation(12.0, 10);
     	driveMotor.enableVoltageCompensation(true);
     	driveMotor.configOpenloopRamp(0.25, 10);

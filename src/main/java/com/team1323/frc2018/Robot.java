@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
+import com.team1323.frc2018.auto.modes.LeftScaleMode;
 import com.team1323.frc2018.loops.LimelightProcessor;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
@@ -153,7 +154,9 @@ public class Robot extends IterativeRobot {
 		    points++;
 		}
 		System.out.println("Max Path Velocity: " + maxSpeed + ", Number of Points: " + points);*/
-		qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
+		//qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
+		//qTransmitter.addPaths(LeftScaleMode.getPaths());
+		//System.out.println("Number of paths " + LeftScaleMode.getPaths().size());
 	}
 	
 	public void allPeriodic(){
@@ -293,7 +296,7 @@ public class Robot extends IterativeRobot {
 				//swerve.toggleEvade();
 				swerve.temporarilyDisableHeadingController();
 				swerve.zeroSensors(Constants.kRobotLeftStartingPose);
-				swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().sideStartToFarScale.get(false))), 0.0, 2.0);
+				//swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().sideStartToFarScale.get(false))), 0.0, 2.0);
 			}
 						
 			if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())

@@ -8,6 +8,7 @@ import com.team1323.frc2018.Ports;
 import com.team1323.frc2018.loops.Loop;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.lib.util.Util;
+import com.team254.drivers.TalonSRXFactory;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -35,15 +36,14 @@ public class Wrist extends Subsystem{
 	private WristControlState currentState = WristControlState.OPEN_LOOP;
 	
 	private Wrist(){
+		//wrist = TalonSRXFactory.createDefaultTalon(Ports.WRIST);
 		wrist = new TalonSRX(Ports.WRIST);
+		wrist.configVoltageCompSaturation(12.0, 10);
 		wrist.enableVoltageCompensation(true);
 		wrist.configNominalOutputForward(0.45/12.0, 10);
-		//wrist.configNominalOutputForward(-0.45/12.0, 10);
-		wrist.configPeakOutputForward(1.0, 10);
-		wrist.configPeakOutputReverse(-1.0, 10);
 		wrist.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		wrist.setSensorPhase(false);
-		wrist.getSensorCollection().setPulseWidthPosition(0, 10);
+		wrist.getSensorCollection().setPulseWidthPosition(0, 100);
 		resetToAbsolutePosition();
 		wrist.selectProfileSlot(0, 0);
 		wrist.config_kP(0, 3.0, 10);

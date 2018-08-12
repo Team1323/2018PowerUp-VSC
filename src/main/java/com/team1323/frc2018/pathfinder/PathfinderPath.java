@@ -16,8 +16,8 @@ import jaci.pathfinder.Waypoint;
 import jaci.pathfinder.followers.DistanceFollower;
 
 public class PathfinderPath {
-	protected double maxSpeed = 10.0;
-	protected double maxAccel = 10.0;
+	public double maxSpeed = 10.0;
+	public double maxAccel = 10.0;
 	protected double maxJerk = 84.0;
 	protected double dt = 0.02;
 	protected int samples = Trajectory.Config.SAMPLES_LOW;

@@ -1,5 +1,7 @@
 package com.team1323.frc2018.auto.modes;
 
+import java.util.Arrays;
+
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.auto.AutoModeBase;
 import com.team1323.frc2018.auto.AutoModeEndedException;
@@ -18,7 +20,12 @@ import com.team1323.frc2018.subsystems.Intake;
 import com.team1323.frc2018.subsystems.Intake.IntakeState;
 import com.team1323.frc2018.subsystems.Superstructure;
 import com.team1323.frc2018.subsystems.Swerve;
+import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
+import com.team254.lib.trajectory.timing.TimedState;
+import java.util.List;
+import java.util.ArrayList;
+import com.team254.lib.trajectory.Trajectory;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -26,6 +33,12 @@ public class LeftScaleMode extends AutoModeBase{
 	Superstructure s;
 	Intake intake;
 	
+	static{
+		paths = Arrays.asList(trajectories.startToLeftScale, trajectories.alternateLeftmostCube,
+		trajectories.derpLeftCubeToLeftScale, trajectories.alternateLeftScaleToSecondCube,
+		trajectories.alternateSecondLeftCubeToScale);
+	}
+
 	public LeftScaleMode(){
 		s = Superstructure.getInstance();
 		intake = Intake.getInstance();

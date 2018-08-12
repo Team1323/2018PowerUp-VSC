@@ -28,31 +28,17 @@ public class QuinticPathTransmitter implements Loop{
 	
 	private List<TrajectoryIterator<TimedState<Pose2dWithCurvature>>> remainingTrajectories = new ArrayList<>();
 	private TrajectoryIterator<TimedState<Pose2dWithCurvature>> currentTrajectory;
-	
-	private final double stepSize = 0.01;
 	private double t = 0;
 	
 	private double startingTime = 0.0;
 	
-	private int index = 0;
-	
-	/*public void addPaths(List<PathfinderPath> paths){
-		remainingPaths = new ArrayList<>();
-		cachedPaths = remainingPaths;
-		
-		for(PathfinderPath path : paths){
-			List<QuinticHermiteSpline> splines = path.toSplines();
-			for(QuinticHermiteSpline spline : splines){
-				remainingPaths.add(spline);
-			}
-		}
-		
-		currentPath = null;
-	}*/
-	
 	public void addPath(Trajectory<TimedState<Pose2dWithCurvature>> path){
 		remainingTrajectories.add(new TrajectoryIterator<>(new TimedView<>(path)));
 		currentTrajectory = null;
+	}
+
+	public void addPaths(List<Trajectory<TimedState<Pose2dWithCurvature>>> paths){
+		paths.forEach((p) -> addPath(p));
 	}
 
 	@Override
@@ -69,20 +55,13 @@ public class QuinticPathTransmitter implements Loop{
 			
 			currentTrajectory = remainingTrajectories.remove(0);
 			t = 0;
-			index = 0;
 			startingTime = timestamp;
 		}
 		
 		t = timestamp - startingTime;
-		//Translation2d pos = currentPath.getPoint(t);
 		Translation2d pos = currentTrajectory.preview(t).state().state().getTranslation();
-	    /*SmartDashboard.putNumber("Path X", pos.x());
-	    SmartDashboard.putNumber("Path Y", pos.y());
-	    SmartDashboard.putNumber("Path Velocity", currentTrajectory.preview(t).state().velocity() / 12.0);*/
 	    SmartDashboard.putNumberArray("Path Pose", new double[]{pos.x(), pos.y(), 0.0, currentTrajectory.preview(t).state().velocity() / 12.5});
-	    //t += stepSize;
-	    //index++;
-	    
+	    System.out.println("Path transmitting");
 	    if(t >= currentTrajectory.trajectory().getLastState().t()){
 	    	System.out.println("Path should take " + currentTrajectory.trajectory().getLastState().t() + " seconds");
 	    	currentTrajectory = null;

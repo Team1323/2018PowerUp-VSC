@@ -8,6 +8,7 @@ import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
 import com.team1323.frc2018.loops.Loop;
 import com.team1323.frc2018.loops.Looper;
+import com.team254.drivers.TalonSRXFactory;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -32,6 +33,8 @@ public class Intake extends Subsystem{
 	private DigitalInput banner;
 	
 	private Intake(){
+		//leftIntake = TalonSRXFactory.createDefaultTalon(Ports.INTAKE_LEFT);
+		//rightIntake = TalonSRXFactory.createDefaultTalon(Ports.INTAKE_RIGHT);
 		leftIntake = new TalonSRX(Ports.INTAKE_LEFT);
 		rightIntake = new TalonSRX(Ports.INTAKE_RIGHT);
 		pinchers = new Solenoid(20, Ports.INTAKE_PINCHERS);
@@ -44,18 +47,10 @@ public class Intake extends Subsystem{
 		leftIntake.setNeutralMode(NeutralMode.Brake);
 		rightIntake.setNeutralMode(NeutralMode.Brake);
 		
-		leftIntake.configPeakOutputForward(1.0, 10);
-		rightIntake.configPeakOutputForward(1.0, 10);
-		leftIntake.configPeakOutputReverse(-1.0, 10);
-		rightIntake.configPeakOutputReverse(-1.0, 10);
-		
 		leftIntake.configVoltageCompSaturation(12.0, 10);
 		rightIntake.configVoltageCompSaturation(12.0, 10);
 		leftIntake.enableVoltageCompensation(true);
 		rightIntake.enableVoltageCompensation(true);
-		
-		leftIntake.configOpenloopRamp(0.0, 10);
-		rightIntake.configOpenloopRamp(0.0, 10);
 		
 		leftIntake.configContinuousCurrentLimit(20, 10);
 		leftIntake.configPeakCurrentLimit(30, 10);
