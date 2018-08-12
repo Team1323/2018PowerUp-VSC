@@ -2,13 +2,12 @@ package com.team1323.frc2018.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
+import com.team1323.frc2018.loops.ILooper;
 import com.team1323.frc2018.loops.Loop;
-import com.team1323.frc2018.loops.Looper;
 import com.team1323.lib.util.Util;
-import com.team254.drivers.TalonSRXFactory;
+import com.team254.drivers.LazyTalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
@@ -22,7 +21,7 @@ public class Wrist extends Subsystem{
 		return instance;
 	}
 
-	TalonSRX wrist;
+	LazyTalonSRX wrist;
 	private double targetAngle = 0.0;
 	private double maxAllowableAngle = Constants.kWristMaxControlAngle;
 	public void setMaxAllowableAngle(double angle){
@@ -34,10 +33,12 @@ public class Wrist extends Subsystem{
 		OPEN_LOOP, POSITION
 	}
 	private WristControlState currentState = WristControlState.OPEN_LOOP;
+
+	PeriodicIO periodicIO = new PeriodicIO();
 	
 	private Wrist(){
 		//wrist = TalonSRXFactory.createDefaultTalon(Ports.WRIST);
-		wrist = new TalonSRX(Ports.WRIST);
+		wrist = new LazyTalonSRX(Ports.WRIST);
 		wrist.configVoltageCompSaturation(12.0, 10);
 		wrist.enableVoltageCompensation(true);
 		wrist.configNominalOutputForward(0.45/12.0, 10);
@@ -67,7 +68,7 @@ public class Wrist extends Subsystem{
 	}
 	
 	public void setOpenLoop(double output){
-		wrist.set(ControlMode.PercentOutput, output);
+		periodicIO.demand = output;
 		currentState = WristControlState.OPEN_LOOP;
 	}
 	
@@ -86,7 +87,7 @@ public class Wrist extends Subsystem{
 				wrist.selectProfileSlot(1, 0);
 			else
 				wrist.selectProfileSlot(0, 0);
-			wrist.set(ControlMode.MotionMagic, wristAngleToEncUnits(targetAngle));
+			periodicIO.position = wristAngleToEncUnits(targetAngle);
 			currentState = WristControlState.POSITION;
 		}else{
 			DriverStation.reportError("Wrist encoder not detected!", false);
@@ -137,14 +138,14 @@ public class Wrist extends Subsystem{
 	}
 	
 	public double getAngle(){
-		return encUnitsToWristAngle(wrist.getSelectedSensorPosition(0));
+		return encUnitsToWristAngle(periodicIO.position);
 	}
 	
 	public boolean hasReachedTargetAngle(){
 		return Math.abs(targetAngle - getAngle()) <= Constants.kWristAngleTolerance;
 	}
 	
-	public double encUnitsToDegrees(int encUnits){
+	public double encUnitsToDegrees(double encUnits){
 		return encUnits / 4096.0 / Constants.kWristEncoderToOutputRatio * 360.0;
 	}
 	
@@ -200,6 +201,22 @@ public class Wrist extends Subsystem{
 	};
 
 	@Override
+	public synchronized void readPeriodicInputs() {
+		periodicIO.position = wrist.getSelectedSensorPosition(0);
+		periodicIO.velocity = wrist.getSelectedSensorVelocity(0);
+		periodicIO.voltage = wrist.getMotorOutputVoltage();
+		periodicIO.current = wrist.getOutputCurrent();
+	}
+
+	@Override
+	public synchronized void writePeriodicOutputs() {
+		if(currentState == WristControlState.POSITION)
+			wrist.set(ControlMode.MotionMagic, periodicIO.demand);
+		else
+			wrist.set(ControlMode.PercentOutput, periodicIO.demand);
+	}
+
+	@Override
 	public void stop() {
 		setOpenLoop(0.0);
 	}
@@ -210,15 +227,15 @@ public class Wrist extends Subsystem{
 	}
 
 	@Override
-	public void registerEnabledLoops(Looper enabledLooper) {
+	public void registerEnabledLoops(ILooper enabledLooper) {
 		enabledLooper.register(loop);
 	}
 
 	@Override
-	public void outputToSmartDashboard() {
-		SmartDashboard.putNumber("Wrist Current", wrist.getOutputCurrent());
+	public void outputTelemetry() {
+		SmartDashboard.putNumber("Wrist Current", periodicIO.current);
 		//SmartDashboard.putNumber("Wrist Voltage", wrist.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Wrist Encoder", wrist.getSelectedSensorPosition(0));
+		SmartDashboard.putNumber("Wrist Encoder", periodicIO.position);
 		SmartDashboard.putNumber("Wrist Pulse Width Position", wrist.getSensorCollection().getPulseWidthPosition());
 		SmartDashboard.putNumber("Wrist Angle", getAngle());
 		//SmartDashboard.putNumber("Wrist Velocity", wrist.getSelectedSensorVelocity(0));
@@ -256,5 +273,16 @@ public class Wrist extends Subsystem{
 		}
 		
 		return passed;
+	}
+
+	public static class PeriodicIO{
+		//Inputs
+		public int position;
+		public int velocity;
+		public double voltage;
+		public double current;
+
+		//Outputs
+		public double demand;
 	}
 }

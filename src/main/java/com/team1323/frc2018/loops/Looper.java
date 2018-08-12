@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * This code runs all of the robot's loops. Loop objects are stored in a List object. They are started when the robot
  * powers up and stopped after the match.
  */
-public class Looper {
+public class Looper implements ILooper {
     public final double kPeriod = Constants.kLooperDt;
 
     private boolean running_;
@@ -23,7 +23,7 @@ public class Looper {
     private final List<Loop> loops_;
     private final Object taskRunningLock_ = new Object();
     private double timestamp_ = 0;
-    public double dt_ = 0;
+    private double dt_ = 0;
 
     private final CrashTrackingRunnable runnable_ = new CrashTrackingRunnable() {
         @Override
@@ -49,6 +49,7 @@ public class Looper {
         loops_ = new ArrayList<>();
     }
 
+    @Override
     public synchronized void register(Loop loop) {
         synchronized (taskRunningLock_) {
             loops_.add(loop);

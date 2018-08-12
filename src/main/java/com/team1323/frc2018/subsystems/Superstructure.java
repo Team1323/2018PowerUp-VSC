@@ -10,8 +10,8 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
+import com.team1323.frc2018.loops.ILooper;
 import com.team1323.frc2018.loops.Loop;
-import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.subsystems.Intake.IntakeState;
 import com.team1323.lib.util.InterpolatingDouble;
 
@@ -294,12 +294,12 @@ public class Superstructure extends Subsystem{
 	}
 
 	@Override
-	public void registerEnabledLoops(Looper enabledLooper) {
+	public void registerEnabledLoops(ILooper enabledLooper) {
 		enabledLooper.register(loop);
 	}
 
 	@Override
-	public void outputToSmartDashboard() {
+	public void outputTelemetry() {
 		
 	}
 

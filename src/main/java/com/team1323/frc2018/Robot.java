@@ -62,8 +62,7 @@ public class Robot extends IterativeRobot {
 	private PathTransmitter transmitter = PathTransmitter.getInstance();
 	private QuinticPathTransmitter qTransmitter = QuinticPathTransmitter.getInstance();
 	private SmartDashboardInteractions smartDashboardInteractions = new SmartDashboardInteractions();
-	
-	private Looper swerveLooper = new Looper();
+
 	private Looper enabledLooper = new Looper();
 	private Looper disabledLooper = new Looper();
 	
@@ -87,7 +86,8 @@ public class Robot extends IterativeRobot {
 		elevator = Elevator.getInstance();
 		subsystems = new SubsystemManager(
 				Arrays.asList(Intake.getInstance(), Elevator.getInstance(), 
-						Wrist.getInstance(), Superstructure.getInstance()));
+						Wrist.getInstance(), Superstructure.getInstance(),
+						Swerve.getInstance()));
 		
 		driver = new Xbox(0);
 		coDriver = new Xbox(1);
@@ -95,9 +95,9 @@ public class Robot extends IterativeRobot {
 		coDriver.setDeadband(0.4);
 		
 		Logger.clearLog();
-		
-		swerve.registerEnabledLoops(swerveLooper);
+
 		subsystems.registerEnabledLoops(enabledLooper);
+		subsystems.registerDisabledLoops(disabledLooper);
 		enabledLooper.register(LimelightProcessor.getInstance());
 		enabledLooper.register(RobotStateEstimator.getInstance());
 		enabledLooper.register(PathTransmitter.getInstance());
@@ -106,54 +106,14 @@ public class Robot extends IterativeRobot {
 		disabledLooper.register(RobotStateEstimator.getInstance());
 		disabledLooper.register(PathTransmitter.getInstance());
 		disabledLooper.register(QuinticPathTransmitter.getInstance());
-		
-		subsystems.zeroSensors();
+
 		swerve.zeroSensors();
 		
 		smartDashboardInteractions.initWithDefaults();
 		initCamera();
 		
 		generator.generateTrajectories();
-		
-		//PathManager.buildAllPaths();
-		
-		/*transmitter.addPaths(Arrays.asList(PathManager.mLeftSwitchDropoff, PathManager.mLeftmostCubePickup,
-				PathManager.mLeftCubeToLeftScale, PathManager.mLeftScaleToSecondCube, PathManager.mSecondLeftCubeToScale,
-				PathManager.mLeftScaleToThirdCube));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mRightSwitchDropoff, PathManager.mRightmostCubePickup,
-				PathManager.mRightCubeToRightScale, PathManager.mRightScaleToSecondCube, PathManager.mSecondRightCubeToScale));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mRightSwitchDropoff, PathManager.mRightmostCubePickup,
-				PathManager.mRightCubeToLeftScale, PathManager.mLeftScaleToFirstCube));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mLeftSwitchDropoff, PathManager.mLeftmostCubePickup,
-				PathManager.mLeftCubeToRightScale, PathManager.mRightScaleToFirstCube));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mFrontLeftSwitch, PathManager.mFrontLeftSwitchToOuterCube, 
-				PathManager.mOuterCubeToFrontLeftSwitch, PathManager.mFrontLeftSwitchToMiddleCube, PathManager.mMiddleCubeToFrontLeftSwitch,
-				PathManager.mFrontLeftSwitchToBottomMiddle, PathManager.mFrontLeftSwitchToDropoff));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mFrontRightSwitch, PathManager.mFrontRightSwitchToOuterCube, 
-				PathManager.mOuterCubeToFrontRightSwitch, PathManager.mFrontRightSwitchToMiddleCube, PathManager.mMiddleCubeToFrontRightSwitch,
-				PathManager.mFrontRightSwitchToBottomMiddle, PathManager.mFrontRightSwitchToDropoff));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mStartToLeftScale, PathManager.mAlternateLeftmostCube,
-				PathManager.mDerpLeftCubeToLeftScale, PathManager.mAlternateLeftScaleToSecondCube,
-				PathManager.mAlternateSecondLeftCubeToScale));*/
-		/*transmitter.addPaths(Arrays.asList(PathManager.mStartToRightScale, PathManager.mRightScaleToFirstCube,
-				PathManager.mAlternateRightCubeToRightScale, PathManager.mAlternateRightScaleToSecondCube));*/
-		
-		//qTransmitter.addPaths(Arrays.asList(PathManager.mStartToRightScale));
-		
-		/*PathfinderPath path = PathManager.mStartToRightScale;
-		double maxSpeed = 0.0;
-		int points = 0;
-		
-		for (int i = 0; i < path.getTrajectory().length(); i++) {
-		    Trajectory.Segment seg = path.getTrajectory().get(i);
-		    String coordinates = "(" + Double.toString(seg.y) + ", " + Double.toString(seg.x) + ")";
-		    if(i != (path.getTrajectory().length() - 1))
-		    	coordinates += ", ";
-		    Logger.log(coordinates);
-		    maxSpeed = (seg.velocity > maxSpeed) ? seg.velocity : maxSpeed;
-		    points++;
-		}
-		System.out.println("Max Path Velocity: " + maxSpeed + ", Number of Points: " + points);*/
+
 		//qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
 		//qTransmitter.addPaths(LeftScaleMode.getPaths());
 		//System.out.println("Number of paths " + LeftScaleMode.getPaths().size());
@@ -161,10 +121,8 @@ public class Robot extends IterativeRobot {
 	
 	public void allPeriodic(){
 		subsystems.outputToSmartDashboard();
-		swerve.outputToSmartDashboard();
 		robotState.outputToSmartDashboard();
-		//SmartDashboard.putNumber("Swerve dt", swerveLooper.dt_);
-		//enabledLooper.outputToSmartDashboard();
+		enabledLooper.outputToSmartDashboard();
 		
 	}
 	
@@ -182,14 +140,12 @@ public class Robot extends IterativeRobot {
 			if(autoModeExecuter != null)
 				autoModeExecuter.stop();
 			
-			subsystems.zeroSensors();
 			swerve.zeroSensors();
 			swerve.setNominalDriveOutput(1.5);
 			swerve.requireModuleConfiguration();
 			transmitter.transmitCachedPaths();
 			
 			disabledLooper.stop();
-			swerveLooper.start();
 			enabledLooper.start();
 			
 			limelight.setVisionMode();
@@ -228,8 +184,6 @@ public class Robot extends IterativeRobot {
 	public void teleopInit(){
 		try{
 			disabledLooper.stop();
-			swerveLooper.stop();
-			swerveLooper.start();
 			enabledLooper.start();
 			superstructure.enableCompressor(true);
 			limelight.setDriverMode();
@@ -238,8 +192,6 @@ public class Robot extends IterativeRobot {
 			superstructure.elevator.setCurrentLimit(30);
 			superstructure.elevator.configForTeleopSpeed();
 			superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
-			//limelight.setVisionMode();
-			//limelight.ledOn(true);
 			//SmartDashboard.putBoolean("Auto", false);
 		}catch(Throwable t){
 			CrashTracker.logThrowableCrash(t);
@@ -410,8 +362,6 @@ public class Robot extends IterativeRobot {
 				autoModeExecuter.stop();
 			enabledLooper.stop();
 			subsystems.stop();
-			swerveLooper.stop();
-			swerveLooper.start();
 			disabledLooper.start();
 			elevator.fireGasStruts(false);
 			elevator.fireLatch(false);

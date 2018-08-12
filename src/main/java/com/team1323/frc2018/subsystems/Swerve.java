@@ -7,8 +7,8 @@ import java.util.List;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.DriveMotionPlanner;
 import com.team1323.frc2018.Ports;
+import com.team1323.frc2018.loops.ILooper;
 import com.team1323.frc2018.loops.Loop;
-import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.pathfinder.PathfinderPath;
 import com.team1323.lib.math.vectors.VectorField;
 import com.team1323.lib.util.SwerveHeadingController;
@@ -566,9 +566,19 @@ public class Swerve extends Subsystem{
 				((Constants.kSwerveRotationSpeedScalar * currentDriveSpeed) + 1.0);
 		modules.forEach((m) -> m.setMaxRotationSpeed(newMaxRotationSpeed));
 	}
+
+	@Override
+	public synchronized void readPeriodicInputs() {
+		modules.forEach((m) -> m.readPeriodicInputs());
+	}
+
+	@Override
+	public synchronized void writePeriodicOutputs() {
+		modules.forEach((m) -> m.writePeriodicOutputs());
+	}
 	
 	@Override
-	public void registerEnabledLoops(Looper enabledLooper) {
+	public void registerEnabledLoops(ILooper enabledLooper) {
 		enabledLooper.register(loop);
 	}
 	
@@ -613,8 +623,8 @@ public class Swerve extends Subsystem{
 	}
 
 	@Override
-	public void outputToSmartDashboard() {
-		modules.forEach((m) -> m.outputToSmartDashboard());
+	public void outputTelemetry() {
+		modules.forEach((m) -> m.outputTelemetry());
 		//SmartDashboard.putNumber("Robot X", pose.getTranslation().x());
 		//SmartDashboard.putNumber("Robot Y", pose.getTranslation().y());
 		SmartDashboard.putNumberArray("Robot Pose", new double[]{pose.getTranslation().x(), pose.getTranslation().y(), pose.getRotation().getUnboundedDegrees()});

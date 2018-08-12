@@ -5,11 +5,10 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
-import com.team1323.frc2018.loops.Looper;
+import com.team1323.frc2018.loops.ILooper;
 import com.team1323.lib.util.Util;
-import com.team254.drivers.TalonSRXFactory;
+import com.team254.drivers.LazyTalonSRX;
 import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
@@ -17,12 +16,11 @@ import com.team254.lib.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
-	TalonSRX rotationMotor, driveMotor;
+	LazyTalonSRX rotationMotor, driveMotor;
 	int moduleID;
 	String name = "Module ";
 	int rotationSetpoint = 0;
 	double driveSetpoint = 0;
-	double currentAngle = 0;
 	int encoderOffset;
 	int encoderReverseFactor = 1;
 	private double previousEncDistance = 0;
@@ -30,13 +28,15 @@ public class SwerveDriveModule extends Subsystem{
 	private Translation2d position;
 	private Translation2d startingPosition;
 	private Pose2d estimatedRobotPose = new Pose2d();
+
+	PeriodicIO periodicIO = new PeriodicIO();
 	
 	public SwerveDriveModule(int rotationSlot, int driveSlot, int moduleID, 
 			int encoderOffset, Translation2d startingPose){
 		//rotationMotor = TalonSRXFactory.createDefaultTalon(rotationSlot);
 		//driveMotor = TalonSRXFactory.createDefaultTalon(driveSlot);
-		rotationMotor = new TalonSRX(rotationSlot);
-		driveMotor = new TalonSRX(driveSlot);
+		rotationMotor = new LazyTalonSRX(rotationSlot);
+		driveMotor = new LazyTalonSRX(driveSlot);
 		configureMotors();
 		this.moduleID = moduleID;
 		name += (moduleID + " ");
@@ -44,7 +44,7 @@ public class SwerveDriveModule extends Subsystem{
 		previousEncDistance = 0;
 		position = startingPose;
 		this.startingPosition = startingPose;
-		updateRawAngle();
+		getRawAngle();
 	}
 	
 	public synchronized void invertDriveMotor(boolean invert){
@@ -120,13 +120,12 @@ public class SwerveDriveModule extends Subsystem{
     	driveMotor.configMotionAcceleration((int)(Constants.kSwerveDriveMaxSpeed), 10);
 	}
 	
-	private double updateRawAngle(){
-		currentAngle = encUnitsToDegrees(rotationMotor.getSelectedSensorPosition(0));
-		return currentAngle;
+	private double getRawAngle(){
+		return encUnitsToDegrees(periodicIO.rotationPosition);
 	}
 	
 	public Rotation2d getModuleAngle(){
-		return Rotation2d.fromDegrees(currentAngle - encUnitsToDegrees(encoderOffset));
+		return Rotation2d.fromDegrees(getRawAngle() - encUnitsToDegrees(encoderOffset));
 	}
 	
 	public Rotation2d getFieldCentricAngle(Rotation2d robotHeading){
@@ -135,45 +134,43 @@ public class SwerveDriveModule extends Subsystem{
 	}
 	
 	public void setModuleAngle(double goalAngle){
-		double newAngle = Util.placeInAppropriate0To360Scope(currentAngle, goalAngle + encUnitsToDegrees(encoderOffset));
+		double newAngle = Util.placeInAppropriate0To360Scope(getRawAngle(), goalAngle + encUnitsToDegrees(encoderOffset));
 		int setpoint = degreesToEncUnits(newAngle);
-		rotationMotor.set(ControlMode.MotionMagic, setpoint);
-		rotationSetpoint = setpoint;
+		periodicIO.rotationControlMode = ControlMode.MotionMagic;
+		periodicIO.rotationDemand = setpoint;
 	}
 	
 	public boolean angleOnTarget(){
-		double error = encUnitsToDegrees(Math.abs(rotationSetpoint - rotationMotor.getSelectedSensorPosition(0)));
-		//System.out.println(name + "error: " + error);
+		double error = encUnitsToDegrees(Math.abs(periodicIO.rotationDemand - periodicIO.rotationPosition));
 		return error < 7.5;
 	}
 	
 	public void setRotationOpenLoop(double power){
-		rotationMotor.set(ControlMode.PercentOutput, power);
+		periodicIO.rotationControlMode = ControlMode.PercentOutput;
+		periodicIO.rotationDemand = power;
 	}
 	
 	public void setDriveOpenLoop(double power){
-		driveMotor.set(ControlMode.PercentOutput, power);
-		driveSetpoint = power;
+		periodicIO.driveControlMode = ControlMode.PercentOutput;
+		periodicIO.driveDemand = power;
 	}
 	
 	public void setDrivePositionTarget(double deltaDistanceInches){
 		driveMotor.selectProfileSlot(0, 0);
-		double setpoint = driveMotor.getSelectedSensorPosition(0) + inchesToEncUnits(deltaDistanceInches);
-		driveMotor.set(ControlMode.MotionMagic, setpoint);
-		driveSetpoint = setpoint;
+		periodicIO.driveControlMode = ControlMode.MotionMagic;
+		periodicIO.driveDemand = periodicIO.drivePosition + inchesToEncUnits(deltaDistanceInches);
 	}
 	
 	public boolean drivePositionOnTarget(){
 		if(driveMotor.getControlMode() == ControlMode.MotionMagic)
-			return encUnitsToInches((int)Math.abs(driveSetpoint - driveMotor.getSelectedSensorPosition(0))) < 2.0;
+			return encUnitsToInches((int)Math.abs(periodicIO.driveDemand - periodicIO.drivePosition)) < 2.0;
 		return false;
 	}
 	
 	public void setVelocitySetpoint(double feetPerSecond){
 		driveMotor.selectProfileSlot(1, 0);
-		double setpoint = feetPerSecondToEncVelocity(feetPerSecond);
-		driveMotor.set(ControlMode.Velocity, setpoint);
-		driveSetpoint = setpoint;
+		periodicIO.driveControlMode = ControlMode.Velocity;
+		periodicIO.driveDemand = feetPerSecondToEncVelocity(feetPerSecond);
 	}
 	
 	private double getDriveDistanceFeet(){
@@ -181,10 +178,10 @@ public class SwerveDriveModule extends Subsystem{
 	}
 	
 	private double getDriveDistanceInches(){
-		return encUnitsToInches(driveMotor.getSelectedSensorPosition(0));
+		return encUnitsToInches(periodicIO.drivePosition);
 	}
 	
-	public double encUnitsToInches(int encUnits){
+	public double encUnitsToInches(double encUnits){
 		return encUnits/Constants.kSwerveEncUnitsPerInch;
 	}
 	
@@ -192,7 +189,7 @@ public class SwerveDriveModule extends Subsystem{
 		return (int) (inches*Constants.kSwerveEncUnitsPerInch);
 	}
 	
-	public double encVelocityToFeetPerSecond(int encUnitsPer100ms){
+	public double encVelocityToFeetPerSecond(double encUnitsPer100ms){
 		return encUnitsToInches(encUnitsPer100ms) / 12.0 * 10;
 	}
 	
@@ -204,7 +201,7 @@ public class SwerveDriveModule extends Subsystem{
 		return (int) (degrees/360.0*Constants.kSwerveDriveEncoderResolution);
 	}
 	
-	public double encUnitsToDegrees(int encUnits){
+	public double encUnitsToDegrees(double encUnits){
 		return encUnits/Constants.kSwerveDriveEncoderResolution*360.0;
 	}
 	
@@ -219,8 +216,7 @@ public class SwerveDriveModule extends Subsystem{
 	public synchronized void updatePose(Rotation2d robotHeading){
 		double currentEncDistance = getDriveDistanceFeet();
 		double deltaEncDistance = (currentEncDistance - previousEncDistance) * Constants.kWheelScrubFactors[moduleID];
-		updateRawAngle();
-		Rotation2d currentWheelAngle = getFieldCentricAngle(Pigeon.getInstance().getAngle());
+		Rotation2d currentWheelAngle = getFieldCentricAngle(robotHeading);
 		Translation2d deltaPosition = new Translation2d(currentWheelAngle.cos()*deltaEncDistance, 
 				currentWheelAngle.sin()*deltaEncDistance);
 		Translation2d updatedPosition = position.translateBy(deltaPosition);
@@ -244,11 +240,23 @@ public class SwerveDriveModule extends Subsystem{
 	public synchronized void resetLastEncoderReading(){
 		previousEncDistance = getDriveDistanceFeet();
 	}
+
+	@Override
+	public synchronized void readPeriodicInputs() {
+		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
+		periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
+		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
+		periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();
+	}
+
+	@Override
+	public synchronized void writePeriodicOutputs() {
+		rotationMotor.set(periodicIO.rotationControlMode, periodicIO.rotationDemand);
+		driveMotor.set(periodicIO.driveControlMode, periodicIO.driveDemand);
+	}
 	
 	@Override
 	public synchronized void stop(){
-		//setModuleAngle(getModuleAngle().getDegrees());
-		//setRotationOpenLoop(0.0);
 		setDriveOpenLoop(0.0);
 	}
 	
@@ -277,24 +285,39 @@ public class SwerveDriveModule extends Subsystem{
 	}
 
 	@Override
-	public void registerEnabledLoops(Looper enabledLooper) {
+	public void registerEnabledLoops(ILooper enabledLooper) {
 		
 	}
 
 	@Override
-	public void outputToSmartDashboard() {
-		updateRawAngle();
+	public void outputTelemetry() {
+		getRawAngle();
 		SmartDashboard.putNumber(name + "Angle", getModuleAngle().getDegrees());
 		SmartDashboard.putNumber(name + "Pulse Width", rotationMotor.getSelectedSensorPosition(0));
-		SmartDashboard.putNumber(name + "Drive Voltage", driveMotor.getMotorOutputVoltage());
+		SmartDashboard.putNumber(name + "Drive Voltage", periodicIO.driveVoltage);
 		SmartDashboard.putNumber(name + "Inches Driven", getDriveDistanceInches());
 		//SmartDashboard.putNumber(name + "Rotation Voltage", rotationMotor.getMotorOutputVoltage());
-		SmartDashboard.putNumber(name + "Velocity", encVelocityToFeetPerSecond(driveMotor.getSelectedSensorVelocity(0)));
+		SmartDashboard.putNumber(name + "Velocity", encVelocityToFeetPerSecond(periodicIO.velocity));
 		/*if(rotationMotor.getControlMode() == ControlMode.MotionMagic)
 			SmartDashboard.putNumber(name + "Error", encUnitsToDegrees(rotationMotor.getClosedLoopError(0)));*/
 		//SmartDashboard.putNumber(name + "X", position.x());
 		//SmartDashboard.putNumber(name + "Y", position.y());
 		//SmartDashboard.putNumber(name + "Drive Current", driveMotor.getOutputCurrent());
+	}
+
+	public static class PeriodicIO{
+		//Inputs
+		public int rotationPosition;
+		public int drivePosition;
+		public int velocity;
+		public double driveVoltage;
+		
+
+		//Outputs
+		public ControlMode rotationControlMode;
+		public ControlMode driveControlMode;
+		public double rotationDemand;
+		public double driveDemand;
 	}
 	
 }

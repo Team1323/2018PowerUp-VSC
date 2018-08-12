@@ -6,9 +6,9 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
+import com.team1323.frc2018.loops.ILooper;
 import com.team1323.frc2018.loops.Loop;
-import com.team1323.frc2018.loops.Looper;
-import com.team254.drivers.TalonSRXFactory;
+import com.team254.drivers.LazyTalonSRX;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Solenoid;
@@ -23,7 +23,7 @@ public class Elevator extends Subsystem{
 		return instance;
 	}
 	
-	TalonSRX master, motor2, motor3;
+	LazyTalonSRX master, motor2, motor3;
 	Solenoid shifter, latch, gasStruts;
 	private double targetHeight = 0.0;
 	private boolean isHighGear = true;
@@ -54,14 +54,16 @@ public class Elevator extends Subsystem{
 	public void setManualSpeed(double speed){
 		manualSpeed = speed;
 	}
+
+	PeriodicIO periodicIO = new PeriodicIO();
 	
 	private Elevator(){
 		//master = TalonSRXFactory.createDefaultTalon(Ports.ELEVATOR_1);
 		//motor2 = TalonSRXFactory.createPermanentSlaveTalon(Ports.ELEVATOR_2, Ports.ELEVATOR_1);
 		//motor3 = TalonSRXFactory.createPermanentSlaveTalon(Ports.ELEVATOR_3, Ports.ELEVATOR_1);
-		master = new TalonSRX(Ports.ELEVATOR_1);
-		motor2 = new TalonSRX(Ports.ELEVATOR_2);
-		motor3 = new TalonSRX(Ports.ELEVATOR_3);
+		master = new LazyTalonSRX(Ports.ELEVATOR_1);
+		motor2 = new LazyTalonSRX(Ports.ELEVATOR_2);
+		motor3 = new LazyTalonSRX(Ports.ELEVATOR_3);
 
 		motor2.set(ControlMode.Follower, Ports.ELEVATOR_1);
 		motor3.set(ControlMode.Follower, Ports.ELEVATOR_1);
@@ -179,7 +181,7 @@ public class Elevator extends Subsystem{
 	
 	public void setOpenLoop(double output){
 		setState(ControlState.OpenLoop);
-		master.set(ControlMode.PercentOutput, output * manualSpeed);
+		periodicIO.demand = output * manualSpeed;
 	}
 	
 	public boolean isOpenLoop(){
@@ -200,7 +202,7 @@ public class Elevator extends Subsystem{
 			else
 				master.selectProfileSlot(1, 0);
 			targetHeight = heightFeet;
-			master.set(ControlMode.MotionMagic, Constants.kElevatorEncoderStartingPosition + feetToEncUnits(heightFeet));
+			periodicIO.demand = Constants.kElevatorEncoderStartingPosition + feetToEncUnits(heightFeet);
 		}else{
 			DriverStation.reportError("Elevator encoder not detected!", false);
 			stop();
@@ -214,7 +216,7 @@ public class Elevator extends Subsystem{
 		if(isSensorConnected()){
 			master.selectProfileSlot(1, 0);
 			targetHeight = heightFeet;
-			master.set(ControlMode.MotionMagic, Constants.kElevatorEncoderStartingPosition + feetToEncUnits(heightFeet));
+			periodicIO.demand = Constants.kElevatorEncoderStartingPosition + feetToEncUnits(heightFeet);
 		}else{
 			DriverStation.reportError("Elevator encoder not detected!", false);
 			stop();
@@ -228,7 +230,7 @@ public class Elevator extends Subsystem{
 				master.selectProfileSlot(0, 0);
 			else
 				master.selectProfileSlot(1, 0);
-			master.set(ControlMode.MotionMagic, master.getSelectedSensorPosition(0) + feetToEncUnits(deltaHeightFeet));
+			periodicIO.demand = master.getSelectedSensorPosition(0) + feetToEncUnits(deltaHeightFeet);
 		}else{
 			DriverStation.reportError("Elevator encoder not detected!", false);
 			stop();
@@ -239,7 +241,7 @@ public class Elevator extends Subsystem{
 		setState(ControlState.Locked);
 		if(isSensorConnected()){
 			targetHeight = getHeight();
-			master.set(ControlMode.MotionMagic, master.getSelectedSensorPosition(0));
+			periodicIO.demand = periodicIO.position;
 		}else{
 			DriverStation.reportError("Elevator encoder not detected!", false);
 			stop();
@@ -313,11 +315,11 @@ public class Elevator extends Subsystem{
 	}
 	
 	public double getHeight(){
-		return encUnitsToFeet(master.getSelectedSensorPosition(0) - Constants.kElevatorEncoderStartingPosition);
+		return encUnitsToFeet(periodicIO.position - Constants.kElevatorEncoderStartingPosition);
 	}
 	
 	public double getVelocityFeetPerSecond(){
-		return encUnitsToFeet(master.getSelectedSensorVelocity(0)) * 10.0;
+		return encUnitsToFeet(periodicIO.velocity) * 10.0;
 	}
 	
 	public boolean hasReachedTargetHeight(){
@@ -330,19 +332,12 @@ public class Elevator extends Subsystem{
 		return (int) (feet * Constants.kElevatorTicksPerFoot);
 	}
 	
-	public double encUnitsToFeet(int encUnits){
+	public double encUnitsToFeet(double encUnits){
 		return encUnits / Constants.kElevatorTicksPerFoot;
 	}
 	
 	private boolean getMotorsWithHighCurrent(){
-		int motors = 0;
-		if(master.getOutputCurrent() >= Constants.kElevatorMaxCurrent)
-			motors++;
-		if(motor2.getOutputCurrent() >= Constants.kElevatorMaxCurrent)
-			motors++;
-		if(motor3.getOutputCurrent() >= Constants.kElevatorMaxCurrent)
-			motors++;
-		return motors > 1;
+		return periodicIO.current >= Constants.kElevatorMaxCurrent;
 	}
 	
 	private final Loop loop  = new Loop(){
@@ -378,6 +373,22 @@ public class Elevator extends Subsystem{
 	}
 
 	@Override
+	public synchronized void readPeriodicInputs(){
+		periodicIO.position = master.getSelectedSensorPosition(0);
+		periodicIO.velocity = master.getSelectedSensorVelocity(0);
+		periodicIO.voltage = master.getMotorOutputVoltage();
+		periodicIO.current = master.getOutputCurrent();
+	}
+
+	@Override
+	public synchronized void writePeriodicOutputs(){
+		if(getState() == ControlState.Position || getState() == ControlState.Locked)
+			master.set(ControlMode.MotionMagic, periodicIO.demand);
+		else
+			master.set(ControlMode.PercentOutput, periodicIO.demand);
+	}
+
+	@Override
 	public void stop() {
 		setOpenLoop(0.0);
 	}
@@ -388,23 +399,23 @@ public class Elevator extends Subsystem{
 	}
 
 	@Override
-	public void registerEnabledLoops(Looper enabledLooper) {
+	public void registerEnabledLoops(ILooper enabledLooper) {
 		enabledLooper.register(loop);
 	}
 	
 	@Override
-	public void outputToSmartDashboard() {
-		SmartDashboard.putNumber("Elevator 1 Current", master.getOutputCurrent());
+	public void outputTelemetry() {
+		SmartDashboard.putNumber("Elevator 1 Current", periodicIO.current);
 		//SmartDashboard.putNumber("Elevator 2 Current", motor2.getOutputCurrent());
 		//SmartDashboard.putNumber("Elevator 3 Current", motor3.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator Voltage", master.getMotorOutputVoltage());
+		SmartDashboard.putNumber("Elevator Voltage", periodicIO.voltage);
 		//SmartDashboard.putNumber("Elevator 2 Voltage", motor2.getMotorOutputVoltage());
 		//SmartDashboard.putNumber("Elevator 3 Voltage", motor3.getMotorOutputVoltage());
 		SmartDashboard.putNumber("Elevator Height", /*Math.round(getHeight()*1000.0)/1000.0*/getHeight());
 		//SmartDashboard.putNumber("Elevator Height Graph", getHeight());
 		//SmartDashboard.putNumber("Elevator Pulse Width Position", master.getSensorCollection().getPulseWidthPosition());
-		SmartDashboard.putNumber("Elevator Encoder", master.getSelectedSensorPosition(0));
-		SmartDashboard.putNumber("Elevator Velocity", master.getSelectedSensorVelocity(0));
+		SmartDashboard.putNumber("Elevator Encoder", periodicIO.position);
+		SmartDashboard.putNumber("Elevator Velocity", periodicIO.velocity);
 		//SmartDashboard.putNumber("Elevator Error", master.getClosedLoopError(0));
 		/*if(master.getControlMode() == ControlMode.MotionMagic)
 			SmartDashboard.putNumber("Elevator Setpoint", master.getClosedLoopTarget(0));*/
@@ -492,5 +503,16 @@ public class Elevator extends Subsystem{
 		configForLifting();
 		
 		return passed;
+	}
+
+	public static class PeriodicIO{
+		//Inputs
+		public int position;
+		public double velocity;
+		public double voltage;
+		public double current;
+
+		//outputs
+		public double demand;
 	}
 }
