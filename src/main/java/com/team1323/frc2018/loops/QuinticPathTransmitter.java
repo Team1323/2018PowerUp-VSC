@@ -3,6 +3,7 @@ package com.team1323.frc2018.loops;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.team1323.frc2018.Constants;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.spline.QuinticHermiteSpline;
@@ -22,13 +23,10 @@ public class QuinticPathTransmitter implements Loop{
 	public QuinticPathTransmitter(){
 	}
 	
-	private List<QuinticHermiteSpline> remainingPaths = new ArrayList<>();
-	private QuinticHermiteSpline currentPath;
-	private List<QuinticHermiteSpline> cachedPaths = remainingPaths;
-	
 	private List<TrajectoryIterator<TimedState<Pose2dWithCurvature>>> remainingTrajectories = new ArrayList<>();
 	private TrajectoryIterator<TimedState<Pose2dWithCurvature>> currentTrajectory;
 	private double t = 0;
+	private boolean defaultCookReported = false;
 	
 	private double startingTime = 0.0;
 	
@@ -54,14 +52,21 @@ public class QuinticPathTransmitter implements Loop{
 			}
 			
 			currentTrajectory = remainingTrajectories.remove(0);
+			defaultCookReported = false;
 			t = 0;
 			startingTime = timestamp;
 		}
 		
 		t = timestamp - startingTime;
-		Translation2d pos = currentTrajectory.preview(t).state().state().getTranslation();
-	    SmartDashboard.putNumberArray("Path Pose", new double[]{pos.x(), pos.y(), 0.0, currentTrajectory.preview(t).state().velocity() / 12.5});
-	    System.out.println("Path transmitting");
+		TimedState<Pose2dWithCurvature> state = currentTrajectory.preview(t).state();
+		Translation2d pos = state.state().getTranslation();
+		SmartDashboard.putNumberArray("Path Pose", new double[]{pos.x(), pos.y(), 0.0, state.velocity() / Constants.kSwerveMaxSpeedFeetPerSecond});
+		
+		if(state.acceleration() < 0.0 && !defaultCookReported){
+			System.out.println("Optimal default cook: " + state.velocity());
+			defaultCookReported = true;
+		}
+
 	    if(t >= currentTrajectory.trajectory().getLastState().t()){
 	    	System.out.println("Path should take " + currentTrajectory.trajectory().getLastState().t() + " seconds");
 	    	currentTrajectory = null;

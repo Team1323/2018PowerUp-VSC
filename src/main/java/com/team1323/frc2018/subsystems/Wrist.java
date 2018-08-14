@@ -87,7 +87,7 @@ public class Wrist extends Subsystem{
 				wrist.selectProfileSlot(1, 0);
 			else
 				wrist.selectProfileSlot(0, 0);
-			periodicIO.position = wristAngleToEncUnits(targetAngle);
+			periodicIO.demand = wristAngleToEncUnits(targetAngle);
 			currentState = WristControlState.POSITION;
 		}else{
 			DriverStation.reportError("Wrist encoder not detected!", false);
@@ -203,9 +203,9 @@ public class Wrist extends Subsystem{
 	@Override
 	public synchronized void readPeriodicInputs() {
 		periodicIO.position = wrist.getSelectedSensorPosition(0);
-		periodicIO.velocity = wrist.getSelectedSensorVelocity(0);
-		periodicIO.voltage = wrist.getMotorOutputVoltage();
-		periodicIO.current = wrist.getOutputCurrent();
+		//periodicIO.velocity = wrist.getSelectedSensorVelocity(0);
+		//periodicIO.voltage = wrist.getMotorOutputVoltage();
+		//periodicIO.current = wrist.getOutputCurrent();
 	}
 
 	@Override
@@ -233,10 +233,10 @@ public class Wrist extends Subsystem{
 
 	@Override
 	public void outputTelemetry() {
-		SmartDashboard.putNumber("Wrist Current", periodicIO.current);
+		//SmartDashboard.putNumber("Wrist Current", periodicIO.current);
 		//SmartDashboard.putNumber("Wrist Voltage", wrist.getMotorOutputVoltage());
 		SmartDashboard.putNumber("Wrist Encoder", periodicIO.position);
-		SmartDashboard.putNumber("Wrist Pulse Width Position", wrist.getSensorCollection().getPulseWidthPosition());
+		//SmartDashboard.putNumber("Wrist Pulse Width Position", wrist.getSensorCollection().getPulseWidthPosition());
 		SmartDashboard.putNumber("Wrist Angle", getAngle());
 		//SmartDashboard.putNumber("Wrist Velocity", wrist.getSelectedSensorVelocity(0));
 		//SmartDashboard.putNumber("Wrist Error", wrist.getClosedLoopError(0));

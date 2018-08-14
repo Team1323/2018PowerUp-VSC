@@ -18,12 +18,12 @@ public class SmartDashboardInteractions {
 	private static final String AUTO_OPTIONS = "auto_options";
     private static final String SELECTED_AUTO_MODE = "selected_auto_mode";
     
-    private static final AutoOption DEFAULT_MODE = AutoOption.SWITCH_AND_SCALE;
+    private static final AutoOption DEFAULT_MODE = AutoOption.SCALE_ONLY;
     
-    private SendableChooser modeChooser;
+    private SendableChooser<AutoOption> modeChooser;
     
     public void initWithDefaults(){
-    	modeChooser = new SendableChooser();
+    	modeChooser = new SendableChooser<AutoOption>();
     	modeChooser.addDefault("Switch and Scale", DEFAULT_MODE);
     	modeChooser.addObject("Switch Only", AutoOption.SWITCH_ONLY);
     	modeChooser.addObject("Scale Only", AutoOption.SCALE_ONLY);

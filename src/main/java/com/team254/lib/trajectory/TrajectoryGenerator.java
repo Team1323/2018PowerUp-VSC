@@ -64,8 +64,9 @@ public class TrajectoryGenerator {
             double max_vel,  // inches/s
             double max_accel,  // inches/s^2
             double max_decel,
-            double max_voltage) {
-        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, max_vel, max_accel, max_decel, max_voltage);
+            double max_voltage,
+            double default_vel) {
+        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, max_vel, max_accel, max_decel, max_voltage, default_vel);
     }
 
     public Trajectory<TimedState<Pose2dWithCurvature>> generateTrajectory(
@@ -77,8 +78,9 @@ public class TrajectoryGenerator {
             double max_vel,  // inches/s
             double max_accel,  // inches/s^2
             double max_decel,
-            double max_voltage) {
-        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, start_vel, end_vel, max_vel, max_accel, max_decel, max_voltage);
+            double max_voltage,
+            double default_vel) {
+        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, start_vel, end_vel, max_vel, max_accel, max_decel, max_voltage, default_vel);
     }
 
     // CRITICAL POSES
@@ -109,16 +111,20 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateLeftScaleToSecondCube;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateSecondLeftCubeToScale;
 
+        public final Trajectory<TimedState<Pose2dWithCurvature>> startToRightScale;
+
         private TrajectorySet() {
             startToLeftScale = getStartToLeftScale();
-            alternateLeftmostCube = convertPath(PathManager.mAlternateLeftmostCube);
-            derpLeftCubeToLeftScale = convertPath(PathManager.mDerpLeftCubeToLeftScale);
-            alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube);
-            alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale);
+            alternateLeftmostCube = convertPath(PathManager.mAlternateLeftmostCube, 1.9);
+            derpLeftCubeToLeftScale = convertPath(PathManager.mDerpLeftCubeToLeftScale, 3.5);
+            alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube, 4.7);
+            alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
+
+            startToRightScale = convertPath(PathManager.mStartToRightScale, 0.5);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
-            return convertPath(PathManager.mStartToLeftScale);
+            return convertPath(PathManager.mStartToLeftScale, 5.5);
         }
 
 
@@ -132,8 +138,8 @@ public class TrajectoryGenerator {
     	return waypoints;
     }
 
-    public Trajectory<TimedState<Pose2dWithCurvature>> convertPath(PathfinderPath path){
+    public Trajectory<TimedState<Pose2dWithCurvature>> convertPath(PathfinderPath path, double defaultCook){
         return generateTrajectory(false, convertWaypoints(path), Arrays.asList(), 
-            path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage);
+            path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage, defaultCook);
     }
 }

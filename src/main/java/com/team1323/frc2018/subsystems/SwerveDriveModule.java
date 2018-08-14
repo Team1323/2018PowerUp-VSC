@@ -245,8 +245,8 @@ public class SwerveDriveModule extends Subsystem{
 	public synchronized void readPeriodicInputs() {
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
 		periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
-		periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
-		periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();
+		//periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
+		//periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();
 	}
 
 	@Override
@@ -291,13 +291,12 @@ public class SwerveDriveModule extends Subsystem{
 
 	@Override
 	public void outputTelemetry() {
-		getRawAngle();
 		SmartDashboard.putNumber(name + "Angle", getModuleAngle().getDegrees());
-		SmartDashboard.putNumber(name + "Pulse Width", rotationMotor.getSelectedSensorPosition(0));
-		SmartDashboard.putNumber(name + "Drive Voltage", periodicIO.driveVoltage);
+		//SmartDashboard.putNumber(name + "Pulse Width", rotationMotor.getSelectedSensorPosition(0));
+		//SmartDashboard.putNumber(name + "Drive Voltage", periodicIO.driveVoltage);
 		SmartDashboard.putNumber(name + "Inches Driven", getDriveDistanceInches());
 		//SmartDashboard.putNumber(name + "Rotation Voltage", rotationMotor.getMotorOutputVoltage());
-		SmartDashboard.putNumber(name + "Velocity", encVelocityToFeetPerSecond(periodicIO.velocity));
+		//SmartDashboard.putNumber(name + "Velocity", encVelocityToFeetPerSecond(periodicIO.velocity));
 		/*if(rotationMotor.getControlMode() == ControlMode.MotionMagic)
 			SmartDashboard.putNumber(name + "Error", encUnitsToDegrees(rotationMotor.getClosedLoopError(0)));*/
 		//SmartDashboard.putNumber(name + "X", position.x());
@@ -314,8 +313,8 @@ public class SwerveDriveModule extends Subsystem{
 		
 
 		//Outputs
-		public ControlMode rotationControlMode;
-		public ControlMode driveControlMode;
+		public ControlMode rotationControlMode = ControlMode.PercentOutput;
+		public ControlMode driveControlMode = ControlMode.PercentOutput;
 		public double rotationDemand;
 		public double driveDemand;
 	}

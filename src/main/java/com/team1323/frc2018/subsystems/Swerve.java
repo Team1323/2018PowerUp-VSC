@@ -188,9 +188,10 @@ public class Swerve extends Subsystem{
 		
 		rotationalInput = rotate;
 		
-		if((translationalInput.norm() != 0 || rotate != 0) && currentState != ControlState.MANUAL)
+		if((translationalInput.norm() != 0 || rotate != 0) && currentState != ControlState.MANUAL){
 			setState(ControlState.MANUAL);
-		
+		}
+
 		if(inputMagnitude > 0.3)
 			lastActiveVector = new Rotation2d(x, y, false);
 		else if(translationalVector.x() == 0.0 && translationalVector.y() == 0.0 && rotate != 0.0){
@@ -538,9 +539,11 @@ public class Swerve extends Subsystem{
 		@Override
 		public void onLoop(double timestamp) {
 			synchronized(Swerve.this){
+				//readPeriodicInputs();
 				if(modulesReady || (getState() != ControlState.PATH_FOLLOWING))
 					updatePose(timestamp);
 				updateControlCycle(timestamp);
+				//writePeriodicOutputs();
 				lastUpdateTimestamp = timestamp;
 			}
 		}

@@ -313,11 +313,10 @@ public class Intake extends Subsystem{
 	
 	@Override
 	public void outputTelemetry() {
-		SmartDashboard.putNumber("Left Intake Current", leftIntake.getOutputCurrent());
+		/*SmartDashboard.putNumber("Left Intake Current", leftIntake.getOutputCurrent());
 		SmartDashboard.putNumber("Right Intake Current", rightIntake.getOutputCurrent());
 		SmartDashboard.putNumber("Left Intake Voltage", leftIntake.getMotorOutputVoltage());
-		SmartDashboard.putNumber("Right Intake Voltage", rightIntake.getMotorOutputVoltage());
-		//SmartDashboard.putString("Intake State", currentState.toString());
+		SmartDashboard.putNumber("Right Intake Voltage", rightIntake.getMotorOutputVoltage());*/
 		SmartDashboard.putBoolean("Intake Has Cube", hasCube);
 		SmartDashboard.putBoolean("Intake Banner", banner.get());
 	}

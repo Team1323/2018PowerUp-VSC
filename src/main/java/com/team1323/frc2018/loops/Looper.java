@@ -24,6 +24,7 @@ public class Looper implements ILooper {
     private final Object taskRunningLock_ = new Object();
     private double timestamp_ = 0;
     private double dt_ = 0;
+    public double dt(){ return dt_; }
 
     private final CrashTrackingRunnable runnable_ = new CrashTrackingRunnable() {
         @Override

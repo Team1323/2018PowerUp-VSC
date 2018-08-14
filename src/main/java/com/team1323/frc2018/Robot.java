@@ -64,6 +64,7 @@ public class Robot extends IterativeRobot {
 	private SmartDashboardInteractions smartDashboardInteractions = new SmartDashboardInteractions();
 
 	private Looper enabledLooper = new Looper();
+	//private Looper swerveLooper = new Looper();
 	private Looper disabledLooper = new Looper();
 	
 	private RobotState robotState = RobotState.getInstance();
@@ -71,7 +72,6 @@ public class Robot extends IterativeRobot {
 	private CameraServer cam;
 	
 	private Xbox driver, coDriver;
-	
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -85,7 +85,7 @@ public class Robot extends IterativeRobot {
 		wrist = Wrist.getInstance();
 		elevator = Elevator.getInstance();
 		subsystems = new SubsystemManager(
-				Arrays.asList(Intake.getInstance(), Elevator.getInstance(), 
+				Arrays.asList(Intake.getInstance(), Elevator.getInstance(),
 						Wrist.getInstance(), Superstructure.getInstance(),
 						Swerve.getInstance()));
 		
@@ -115,14 +115,15 @@ public class Robot extends IterativeRobot {
 		generator.generateTrajectories();
 
 		//qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
-		//qTransmitter.addPaths(LeftScaleMode.getPaths());
-		//System.out.println("Number of paths " + LeftScaleMode.getPaths().size());
+		qTransmitter.addPaths(LeftScaleMode.getPaths());
+		//qTransmitter.addPath(generator.getTrajectorySet().startToRightScale);
 	}
 	
 	public void allPeriodic(){
 		subsystems.outputToSmartDashboard();
 		robotState.outputToSmartDashboard();
 		enabledLooper.outputToSmartDashboard();
+		//SmartDashboard.putNumber("Swerve Looper dt", swerveLooper.dt());
 		
 	}
 	
@@ -146,6 +147,7 @@ public class Robot extends IterativeRobot {
 			transmitter.transmitCachedPaths();
 			
 			disabledLooper.stop();
+			//swerveLooper.start();
 			enabledLooper.start();
 			
 			limelight.setVisionMode();
@@ -158,7 +160,7 @@ public class Robot extends IterativeRobot {
 			
 			superstructure.enableCompressor(false);
 			
-			//SmartDashboard.putBoolean("Auto", true);
+			SmartDashboard.putBoolean("Auto", true);
 			
 			String gameData = DriverStation.getInstance().getGameSpecificMessage();
 			autoModeExecuter = new AutoModeExecuter();
@@ -183,8 +185,10 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit(){
 		try{
+			//swerveLooper.stop();
 			disabledLooper.stop();
 			enabledLooper.start();
+			//swerveLooper.start();
 			superstructure.enableCompressor(true);
 			limelight.setDriverMode();
 			limelight.ledOn(false);
@@ -192,7 +196,7 @@ public class Robot extends IterativeRobot {
 			superstructure.elevator.setCurrentLimit(30);
 			superstructure.elevator.configForTeleopSpeed();
 			superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
-			//SmartDashboard.putBoolean("Auto", false);
+			SmartDashboard.putBoolean("Auto", false);
 		}catch(Throwable t){
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -248,7 +252,7 @@ public class Robot extends IterativeRobot {
 				//swerve.toggleEvade();
 				swerve.temporarilyDisableHeadingController();
 				swerve.zeroSensors(Constants.kRobotLeftStartingPose);
-				//swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().sideStartToFarScale.get(false))), 0.0, 2.0);
+				swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 2.0);
 			}
 						
 			if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
@@ -362,6 +366,8 @@ public class Robot extends IterativeRobot {
 				autoModeExecuter.stop();
 			enabledLooper.stop();
 			subsystems.stop();
+			//swerveLooper.stop();
+			//swerveLooper.start();
 			disabledLooper.start();
 			elevator.fireGasStruts(false);
 			elevator.fireLatch(false);

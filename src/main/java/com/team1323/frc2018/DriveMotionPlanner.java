@@ -27,7 +27,7 @@ public class DriveMotionPlanner implements CSVWritable {
     private static final double kMaxDy = 0.25;
     private static final double kMaxDTheta = Math.toRadians(5.0);
     
-    private final double defaultCook = 0.5;
+    private double defaultCook = 0.5;
     private boolean useDefaultCook = true;
     
     private double rotationStartTime = 0.0;
@@ -62,6 +62,7 @@ public class DriveMotionPlanner implements CSVWritable {
     public void setTrajectory(final TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory) {
         mCurrentTrajectory = trajectory;
         mSetpoint = trajectory.getState();
+        defaultCook = trajectory.trajectory().defaultVelocity();
         for (int i = 0; i < trajectory.trajectory().length(); ++i) {
             if (trajectory.trajectory().getState(i).velocity() > Util.kEpsilon) {
                 mIsReversed = false;
@@ -87,8 +88,9 @@ public class DriveMotionPlanner implements CSVWritable {
             double max_vel,  // inches/s
             double max_accel,  // inches/s^2
             double max_decel,
-            double max_voltage) {
-        return generateTrajectory(reversed, waypoints, constraints, 0.0, 0.0, max_vel, max_accel, max_decel, max_voltage);
+            double max_voltage,
+            double default_vel) {
+        return generateTrajectory(reversed, waypoints, constraints, 0.0, 0.0, max_vel, max_accel, max_decel, max_voltage, default_vel);
     }
 
     public Trajectory<TimedState<Pose2dWithCurvature>> generateTrajectory(
@@ -100,7 +102,8 @@ public class DriveMotionPlanner implements CSVWritable {
             double max_vel,  // inches/s
             double max_accel,  // inches/s^2
             double max_decel,
-            double max_voltage) {
+            double max_voltage,
+            double default_vel) {
         List<Pose2d> waypoints_maybe_flipped = waypoints;
         final Pose2d flip = Pose2d.fromRotation(new Rotation2d(-1, 0, false));
         // TODO re-architect the spline generator to support reverse.
@@ -125,9 +128,9 @@ public class DriveMotionPlanner implements CSVWritable {
         }
         // Create the constraint that the robot must be able to traverse the trajectory without ever applying more
         // than the specified voltage.
-        final CurvatureVelocityConstraint velocity_constraints = new CurvatureVelocityConstraint();
+        //final CurvatureVelocityConstraint velocity_constraints = new CurvatureVelocityConstraint();
         List<TimingConstraint<Pose2dWithCurvature>> all_constraints = new ArrayList<>();
-        all_constraints.add(velocity_constraints);
+        //all_constraints.add(velocity_constraints);
         if (constraints != null) {
             all_constraints.addAll(constraints);
         }
@@ -135,6 +138,7 @@ public class DriveMotionPlanner implements CSVWritable {
         Trajectory<TimedState<Pose2dWithCurvature>> timed_trajectory = TimingUtil.timeParameterizeTrajectory
                 (reversed, new
                         DistanceView<>(trajectory), kMaxDx, all_constraints, start_vel, end_vel, max_vel, max_accel, max_decel);
+        timed_trajectory.setDefaultVelocity(default_vel / Constants.kSwerveMaxSpeedFeetPerSecond);
         return timed_trajectory;
     }
     

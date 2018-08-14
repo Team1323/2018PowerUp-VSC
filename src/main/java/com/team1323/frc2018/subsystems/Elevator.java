@@ -122,8 +122,8 @@ public class Elevator extends Subsystem{
 	}
 	
 	public void configForTeleopSpeed(){
-		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear*1.0), 10);//0.9
-		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear*3.0), 10);//5.0
+		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * (Constants.kIsUsingCompBot ? 1.0 : 0.9)), 10);//0.9
+		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* (Constants.kIsUsingCompBot ? 3.0 : 3.0)), 10);//5.0
 	}
 	
 	public void configForAutoSpeed(){
@@ -375,9 +375,9 @@ public class Elevator extends Subsystem{
 	@Override
 	public synchronized void readPeriodicInputs(){
 		periodicIO.position = master.getSelectedSensorPosition(0);
-		periodicIO.velocity = master.getSelectedSensorVelocity(0);
-		periodicIO.voltage = master.getMotorOutputVoltage();
-		periodicIO.current = master.getOutputCurrent();
+		//periodicIO.velocity = master.getSelectedSensorVelocity(0);
+		//periodicIO.voltage = master.getMotorOutputVoltage();
+		//periodicIO.current = master.getOutputCurrent();
 	}
 
 	@Override
@@ -405,17 +405,17 @@ public class Elevator extends Subsystem{
 	
 	@Override
 	public void outputTelemetry() {
-		SmartDashboard.putNumber("Elevator 1 Current", periodicIO.current);
+		//SmartDashboard.putNumber("Elevator 1 Current", periodicIO.current);
 		//SmartDashboard.putNumber("Elevator 2 Current", motor2.getOutputCurrent());
 		//SmartDashboard.putNumber("Elevator 3 Current", motor3.getOutputCurrent());
-		SmartDashboard.putNumber("Elevator Voltage", periodicIO.voltage);
+		//SmartDashboard.putNumber("Elevator Voltage", periodicIO.voltage);
 		//SmartDashboard.putNumber("Elevator 2 Voltage", motor2.getMotorOutputVoltage());
 		//SmartDashboard.putNumber("Elevator 3 Voltage", motor3.getMotorOutputVoltage());
 		SmartDashboard.putNumber("Elevator Height", /*Math.round(getHeight()*1000.0)/1000.0*/getHeight());
 		//SmartDashboard.putNumber("Elevator Height Graph", getHeight());
 		//SmartDashboard.putNumber("Elevator Pulse Width Position", master.getSensorCollection().getPulseWidthPosition());
 		SmartDashboard.putNumber("Elevator Encoder", periodicIO.position);
-		SmartDashboard.putNumber("Elevator Velocity", periodicIO.velocity);
+		//SmartDashboard.putNumber("Elevator Velocity", periodicIO.velocity);
 		//SmartDashboard.putNumber("Elevator Error", master.getClosedLoopError(0));
 		/*if(master.getControlMode() == ControlMode.MotionMagic)
 			SmartDashboard.putNumber("Elevator Setpoint", master.getClosedLoopTarget(0));*/
