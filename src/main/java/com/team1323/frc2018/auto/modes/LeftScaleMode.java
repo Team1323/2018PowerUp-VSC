@@ -52,7 +52,7 @@ public class LeftScaleMode extends AutoModeBase{
 		runAction(new ResetPoseAction(Constants.kRobotLeftStartingPose));
 		//s.request(intake.stateRequest(IntakeState.CLAMPING));
 		//runAction(new FollowPathAction(PathManager.mStartToLeftScale, 50.0));
-		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 50.0, 2.0));
+		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, -90.0, 2.0));
 		/*runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x()));
 		s.request(s.elevatorWristConfig(4.5, 66.0));//66 4.5
 		runAction(new WaitToFinishPathAction());

@@ -115,8 +115,8 @@ public class Robot extends IterativeRobot {
 		generator.generateTrajectories();
 
 		//qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
-		qTransmitter.addPaths(LeftScaleMode.getPaths());
-		//qTransmitter.addPath(generator.getTrajectorySet().startToRightScale);
+		//qTransmitter.addPaths(LeftScaleMode.getPaths());
+		qTransmitter.addPath(generator.getTrajectorySet().startToRightScale);
 	}
 	
 	public void allPeriodic(){

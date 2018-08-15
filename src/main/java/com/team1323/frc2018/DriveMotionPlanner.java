@@ -157,7 +157,6 @@ public class DriveMotionPlanner implements CSVWritable {
     		currentHeading = targetHeading - (((rotationEndTime - currentTime) / rotationTimeDuration) * headingDifferential);
     	else
     		currentHeading = targetHeading;
-    	System.out.println(currentHeading);
     	return currentHeading;
     }
     

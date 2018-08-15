@@ -12,6 +12,7 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
+import com.team254.lib.trajectory.timing.CurvatureVelocityConstraint;
 import com.team254.lib.trajectory.timing.TimedState;
 import com.team254.lib.trajectory.timing.TimingConstraint;
 
@@ -120,7 +121,8 @@ public class TrajectoryGenerator {
             alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube, 4.7);
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
 
-            startToRightScale = convertPath(PathManager.mStartToRightScale, 0.5);
+            //startToRightScale = convertPath(PathManager.mStartToRightScale, 4.0/*, Arrays.asList(new CurvatureVelocityConstraint())*/);
+            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 6.0, kMaxVoltage, 8.0);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
@@ -139,7 +141,12 @@ public class TrajectoryGenerator {
     }
 
     public Trajectory<TimedState<Pose2dWithCurvature>> convertPath(PathfinderPath path, double defaultCook){
-        return generateTrajectory(false, convertWaypoints(path), Arrays.asList(), 
+        return convertPath(path, defaultCook, Arrays.asList());
+    }
+
+    public Trajectory<TimedState<Pose2dWithCurvature>> convertPath(PathfinderPath path, double defaultCook,
+    List<TimingConstraint<Pose2dWithCurvature>> constraints){
+        return generateTrajectory(false, convertWaypoints(path), constraints, 
             path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage, defaultCook);
     }
 }

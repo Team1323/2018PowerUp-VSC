@@ -112,8 +112,8 @@ public class Swerve extends Subsystem{
 	
 	private Translation2d translationalVector = new Translation2d();
 	private double rotationalInput = 0;
-	private Rotation2d lastActiveVector = new Rotation2d();
-	private final Rotation2d rotationalVector = new Rotation2d();
+	private Translation2d lastActiveVector = new Translation2d();
+	private final Translation2d rotationalVector = Translation2d.identity();
 	private double maxSpeedFactor = 1.0;
 	public void setMaxSpeed(double max){
 		maxSpeedFactor = max;
@@ -193,7 +193,7 @@ public class Swerve extends Subsystem{
 		}
 
 		if(inputMagnitude > 0.3)
-			lastActiveVector = new Rotation2d(x, y, false);
+			lastActiveVector = new Translation2d(x, y);
 		else if(translationalVector.x() == 0.0 && translationalVector.y() == 0.0 && rotate != 0.0){
 			lastActiveVector = rotationalVector;
 		}
@@ -298,7 +298,7 @@ public class Swerve extends Subsystem{
 	}
 	
 	public synchronized void determineEvasionWheels(){
-		Translation2d here = lastActiveVector.toTranslation().rotateBy(pose.getRotation().inverse());
+		Translation2d here = lastActiveVector.rotateBy(pose.getRotation().inverse());
 		List<Translation2d> wheels = Constants.kModulePositions;
 		clockwiseCenter = wheels.get(0);
 		counterClockwiseCenter = wheels.get(wheels.size()-1);
@@ -366,7 +366,7 @@ public class Swerve extends Subsystem{
 		pose = updatedPose;
 		modules.forEach((m) -> m.resetPose(pose));
 	}
-	
+	double lastHyp = 0.0;
 	public synchronized void updateControlCycle(double timestamp){
 		if(currentState == ControlState.TRAJECTORY) headingController.setSnapTarget(motionPlanner.getHeading());
 		double rotationCorrection = headingController.updateRotationCorrection(pose.getRotation().getUnboundedDegrees(), timestamp);
@@ -401,7 +401,7 @@ public class Swerve extends Subsystem{
 				if(lastActiveVector.equals(rotationalVector)){
 					stop();
 				}else{
-					List<Translation2d> driveVectors = inverseKinematics.updateDriveVectors(lastActiveVector.toTranslation(),
+					List<Translation2d> driveVectors = inverseKinematics.updateDriveVectors(lastActiveVector,
 							rotationCorrection, pose, robotCentric);
 					for(int i=0; i<modules.size(); i++){
 			    		if(Util.shouldReverse(driveVectors.get(i).direction().getDegrees(), modules.get(i).getModuleAngle().getDegrees())){
@@ -508,8 +508,16 @@ public class Swerve extends Subsystem{
 			setDriveOutput(inverseKinematics.updateDriveVectors(outputVectorV, rotationCorrection, getPose(), false));
 			break;
 		case TRAJECTORY:
-			setDriveOutput(inverseKinematics.updateDriveVectors(motionPlanner.update(timestamp, pose), 
-					rotationCorrection, pose, false));
+			if(!motionPlanner.isDone()){
+				Translation2d driveVector = motionPlanner.update(timestamp, pose);
+				if(Util.epsilonEquals(driveVector.norm(), 0.0, Constants.kEpsilon))
+					driveVector = lastActiveVector;
+				setDriveOutput(inverseKinematics.updateDriveVectors(driveVector, 
+					Util.deadBand(rotationCorrection, 0.05), pose, false));
+				lastActiveVector = driveVector;
+			}else{
+				stop();
+			}
 			break;
 		case NEUTRAL:
 			stop();

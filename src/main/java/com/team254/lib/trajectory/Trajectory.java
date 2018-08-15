@@ -32,7 +32,6 @@ public class Trajectory<S extends State<S>> implements CSVWritable {
      */
     public Trajectory(final List<S> states) {
         points_ = new ArrayList<>(states.size());
-        System.out.println("Traj size: " + states.size());
         for (int i = 0; i < states.size(); ++i) {
             points_.add(new TrajectoryPoint<>(states.get(i), i));
         }
