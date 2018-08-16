@@ -49,7 +49,7 @@ public class TimingUtil {
         predecessor.state = states.get(0);
         predecessor.distance = 0.0;
         predecessor.max_velocity = start_velocity;
-        predecessor.min_acceleration = -max_deceleration;
+        predecessor.min_acceleration = -max_abs_acceleration;
         predecessor.max_acceleration = max_abs_acceleration;
         for (int i = 0; i < states.size(); ++i) {
             // Add the new state.
@@ -71,7 +71,7 @@ public class TimingUtil {
                     throw new RuntimeException();
                 }
                 // Enforce global max absolute acceleration.
-                constraint_state.min_acceleration = -max_deceleration;
+                constraint_state.min_acceleration = -max_abs_acceleration;
                 constraint_state.max_acceleration = max_abs_acceleration;
 
                 // At this point, the state is full constructed, but no constraints have been applied aside from

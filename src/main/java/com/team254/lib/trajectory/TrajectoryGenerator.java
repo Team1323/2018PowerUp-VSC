@@ -122,7 +122,7 @@ public class TrajectoryGenerator {
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
 
             //startToRightScale = convertPath(PathManager.mStartToRightScale, 4.0/*, Arrays.asList(new CurvatureVelocityConstraint())*/);
-            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 6.0, kMaxVoltage, 8.0);
+            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 8.0);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {

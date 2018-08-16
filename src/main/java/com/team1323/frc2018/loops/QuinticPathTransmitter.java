@@ -27,6 +27,8 @@ public class QuinticPathTransmitter implements Loop{
 	private TrajectoryIterator<TimedState<Pose2dWithCurvature>> currentTrajectory;
 	private double t = 0;
 	private boolean defaultCookReported = false;
+
+	private double minAccel = 0.0;
 	
 	private double startingTime = 0.0;
 	
@@ -62,13 +64,18 @@ public class QuinticPathTransmitter implements Loop{
 		Translation2d pos = state.state().getTranslation();
 		SmartDashboard.putNumberArray("Path Pose", new double[]{pos.x(), pos.y(), 0.0, state.velocity() / Constants.kSwerveMaxSpeedFeetPerSecond});
 		
+		//System.out.println("Accel: " + state.acceleration());
+		if(state.acceleration() < minAccel)
+			minAccel = state.acceleration();
+
 		if(state.acceleration() < 0.0 && !defaultCookReported){
 			System.out.println("Optimal default cook: " + state.velocity());
 			defaultCookReported = true;
 		}
 
 	    if(t >= currentTrajectory.trajectory().getLastState().t()){
-	    	System.out.println("Path should take " + currentTrajectory.trajectory().getLastState().t() + " seconds");
+			System.out.println("Path should take " + currentTrajectory.trajectory().getLastState().t() + " seconds");
+			System.out.println("Min accel: " + minAccel);
 	    	currentTrajectory = null;
 	    }
 	}
