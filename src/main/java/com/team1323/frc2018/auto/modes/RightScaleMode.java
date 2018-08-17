@@ -6,6 +6,7 @@ import com.team1323.frc2018.auto.AutoModeEndedException;
 import com.team1323.frc2018.auto.actions.DriveStraightAction;
 import com.team1323.frc2018.auto.actions.FollowPathAction;
 import com.team1323.frc2018.auto.actions.ResetPoseAction;
+import com.team1323.frc2018.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2018.auto.actions.WaitAction;
 import com.team1323.frc2018.auto.actions.WaitForElevatorAction;
 import com.team1323.frc2018.auto.actions.WaitForWallAction;
@@ -35,15 +36,16 @@ public class RightScaleMode extends AutoModeBase{
 	protected void routine() throws AutoModeEndedException {
 		double startTime = Timer.getFPGATimestamp();
 		runAction(new ResetPoseAction(Constants.kRobotLeftStartingPose));
-		s.request(intake.stateRequest(IntakeState.CLAMPING));
-		s.request(Wrist.getInstance().angleRequest(Constants.kWristPrimaryStowAngle));
-		runAction(new FollowPathAction(PathManager.mStartToRightScale, -90.0));
+		//s.request(intake.stateRequest(IntakeState.CLAMPING));
+		s.request(s.wrist.angleRequest(Constants.kWristPrimaryStowAngle));
+		//runAction(new FollowPathAction(PathManager.mStartToRightScale, -90.0));
+		runAction(new SetTrajectoryAction(trajectories.startToRightScale, -90.0, 0.75));
 		runAction(new WaitToPassYCoordinateAction(15.0));
-		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
+		//s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
 		runAction(new WaitToPassYCoordinateAction(17.0));
 		Swerve.getInstance().setAbsolutePathHeading(-40.0);
 		runAction(new WaitToFinishPathAction());
-		runAction(new WaitForElevatorAction());
+		/*runAction(new WaitForElevatorAction());
 		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
@@ -92,7 +94,7 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new FollowPathAction(PathManager.mAlternateRightCubeToRightScale, -55.0));
 		runAction(new WaitAction(0.25));
 		s.request(Wrist.getInstance().angleRequest(Constants.kWristPrimaryStowAngle));
-		runAction(new WaitToFinishPathAction());
+		runAction(new WaitToFinishPathAction());*/
 	}
 
 }

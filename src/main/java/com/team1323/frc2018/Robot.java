@@ -252,7 +252,7 @@ public class Robot extends IterativeRobot {
 				//swerve.toggleEvade();
 				swerve.temporarilyDisableHeadingController();
 				swerve.zeroSensors(Constants.kRobotLeftStartingPose);
-				swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 2.0);
+				swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 0.75);
 			}
 						
 			if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())

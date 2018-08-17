@@ -50,16 +50,14 @@ public class LeftScaleMode extends AutoModeBase{
 	protected void routine() throws AutoModeEndedException {
 		double startTime = Timer.getFPGATimestamp();
 		runAction(new ResetPoseAction(Constants.kRobotLeftStartingPose));
-		//s.request(intake.stateRequest(IntakeState.CLAMPING));
-		//runAction(new FollowPathAction(PathManager.mStartToLeftScale, 50.0));
-		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, -90.0, 2.0));
-		/*runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x()));
+		s.request(intake.stateRequest(IntakeState.CLAMPING));
+		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 50.0, 0.5));
+		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x()));
 		s.request(s.elevatorWristConfig(4.5, 66.0));//66 4.5
 		runAction(new WaitToFinishPathAction());
 		s.request(intake.ejectRequest(Constants.kIntakeStrongEjectOutput));
 		System.out.println("First Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.4));
-		//runAction(new FollowPathAction(PathManager.mAlternateLeftmostCube, 175.0));
 		runAction(new SetTrajectoryAction(trajectories.alternateLeftmostCube, 175.0, 1.0));
 		runAction(new WaitForHeadingAction(80.0, 180.0));
 		s.request(s.elevatorWristIntakeConfig(
@@ -78,20 +76,15 @@ public class LeftScaleMode extends AutoModeBase{
 				Swerve.getInstance().setXCoordinate(19.0);
 		}
 		System.out.println("Second cube intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		//runAction(new FollowPathAction(PathManager.mDerpLeftCubeToLeftScale, 35.0));//40
-		runAction(new SetTrajectoryAction(trajectories.derpLeftCubeToLeftScale, 35.0, 1.0));
+		runAction(new SetTrajectoryAction(trajectories.derpLeftCubeToLeftScale, 35.0, 1.25));
 		runAction(new WaitAction(0.25));
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
-		//runAction(new WaitToPassXCoordinateAction(23.0));
 		runAction(new WaitToFinishPathAction());
 		runAction(new WaitForElevatorAction());
-		//runAction(new WaitForHeadingAction(35.0, 55.0));
 		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
 		System.out.println("Second Cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
-		//runAction(new FollowPathAction(PathManager.mAlternateLeftScaleToSecondCube, 150.0));
-		runAction(new SetTrajectoryAction(trajectories.alternateLeftScaleToSecondCube, 150.0, 1.5));
-		//runAction(new WaitForHeadingAction(60.0, 180.0));
+		runAction(new SetTrajectoryAction(trajectories.alternateLeftScaleToSecondCube, 150.0, 0.75));
 		runAction(new WaitAction(0.75));
 		s.request(s.elevatorWristIntakeConfig(Constants.kElevatorIntakingHeight, Constants.kWristIntakingAngle, IntakeState.INTAKING_WIDE));
 		runAction(new WaitToFinishPathAction());
@@ -104,14 +97,13 @@ public class LeftScaleMode extends AutoModeBase{
 			runAction(new WaitToIntakeCubeAction(1.5));
 		}
 		System.out.println("Third Cube intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		//runAction(new FollowPathAction(PathManager.mAlternateSecondLeftCubeToScale, 55.0));
-		runAction(new SetTrajectoryAction(trajectories.alternateSecondLeftCubeToScale, 55.0, 1.0));
+		runAction(new SetTrajectoryAction(trajectories.alternateSecondLeftCubeToScale, 55.0, 0.75));
 		runAction(new WaitAction(0.25));
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
 		runAction(new WaitToFinishPathAction());
 		runAction(new WaitForElevatorAction());
 		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
-		System.out.println("Third Cube scored at: " + (Timer.getFPGATimestamp() - startTime));*/
+		System.out.println("Third Cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 	}
 	
 }

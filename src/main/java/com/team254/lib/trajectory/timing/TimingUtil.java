@@ -143,6 +143,8 @@ public class TimingUtil {
             ConstrainedState<S> constraint_state = constraint_states.get(i);
             final double ds = constraint_state.distance - successor.distance; // will be negative.
 
+            if(i == states.size() - 2) constraint_state.min_acceleration = -max_deceleration;
+
             while (true) {
                 // Enforce reverse max reachable velocity limit.
                 // vf = sqrt(vi^2 + 2*a*d), where vi = successor.

@@ -77,10 +77,11 @@ public class Swerve extends Subsystem{
 	}
 	boolean hasFinishedPath = false;
 	public boolean hasFinishedPath(){
-		return hasFinishedPath;
+		return hasFinishedPath || motionPlanner.isDone();
 	}
 	
 	DriveMotionPlanner motionPlanner;
+	double rotationScalar;
 	
 	VectorField vf;
 	
@@ -96,6 +97,8 @@ public class Swerve extends Subsystem{
 		
 		modules = Arrays.asList(frontRight, frontLeft, rearLeft, rearRight);
 		positionModules = Arrays.asList(frontRight, frontLeft, rearRight);
+		
+		rearLeft.disableDriveEncoder();
 		
 		rearLeft.invertDriveMotor(true);
 		frontLeft.invertDriveMotor(true);
@@ -282,11 +285,11 @@ public class Swerve extends Subsystem{
 	}
 	
 	public synchronized void setTrajectory(TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
-			double rotationTime){
+			double rotationScalar){
 		motionPlanner.reset();
 		motionPlanner.setTrajectory(trajectory);
-		headingController.setSnapTarget(pose.getRotation().getUnboundedDegrees());
-		motionPlanner.setTargetHeading(targetHeading, rotationTime, pose);
+		setAbsolutePathHeading(targetHeading);
+		this.rotationScalar = rotationScalar;
 		setState(ControlState.TRAJECTORY);
 	}
 	
@@ -368,7 +371,7 @@ public class Swerve extends Subsystem{
 	}
 	double lastHyp = 0.0;
 	public synchronized void updateControlCycle(double timestamp){
-		if(currentState == ControlState.TRAJECTORY) headingController.setSnapTarget(motionPlanner.getHeading());
+		//if(currentState == ControlState.TRAJECTORY) headingController.setSnapTarget(motionPlanner.getHeading());
 		double rotationCorrection = headingController.updateRotationCorrection(pose.getRotation().getUnboundedDegrees(), timestamp);
 		//rotationCorrection = 0.0;
 		switch(currentState){
@@ -513,7 +516,7 @@ public class Swerve extends Subsystem{
 				if(Util.epsilonEquals(driveVector.norm(), 0.0, Constants.kEpsilon))
 					driveVector = lastActiveVector;
 				setDriveOutput(inverseKinematics.updateDriveVectors(driveVector, 
-					Util.deadBand(rotationCorrection, 0.05), pose, false));
+					Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.05), pose, false));
 				lastActiveVector = driveVector;
 			}else{
 				stop();

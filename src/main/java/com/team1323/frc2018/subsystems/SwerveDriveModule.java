@@ -23,6 +23,7 @@ public class SwerveDriveModule extends Subsystem{
 	double driveSetpoint = 0;
 	int encoderOffset;
 	int encoderReverseFactor = 1;
+	boolean useDriveEncoder = true;
 	private double previousEncDistance = 0;
 	private Rotation2d previousWheelAngle = new Rotation2d();
 	private Translation2d position;
@@ -71,6 +72,10 @@ public class SwerveDriveModule extends Subsystem{
 	
 	public synchronized void setMaxRotationSpeed(double maxSpeed){
 		rotationMotor.configMotionCruiseVelocity((int)maxSpeed, 0);
+	}
+
+	public synchronized void disableDriveEncoder(){
+		useDriveEncoder = false;
 	}
 	
 	private void configureMotors(){
@@ -244,7 +249,7 @@ public class SwerveDriveModule extends Subsystem{
 	@Override
 	public synchronized void readPeriodicInputs() {
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
-		periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
+		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
 		//periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 		//periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();
 	}

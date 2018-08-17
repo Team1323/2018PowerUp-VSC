@@ -129,9 +129,7 @@ public class Intake extends Subsystem{
 	public double getHigherCurrent(){
 		double leftCurrent = leftIntake.getOutputCurrent();
 		double rightCurrent = rightIntake.getOutputCurrent();
-		if(leftCurrent > rightCurrent)
-			return leftCurrent;
-		return rightCurrent;
+		return Math.max(leftCurrent, rightCurrent);
 	}
 	
 	public void firePinchers(boolean fire){
