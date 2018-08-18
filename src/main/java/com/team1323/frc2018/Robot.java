@@ -64,12 +64,10 @@ public class Robot extends IterativeRobot {
 	private SmartDashboardInteractions smartDashboardInteractions = new SmartDashboardInteractions();
 
 	private Looper enabledLooper = new Looper();
-	//private Looper swerveLooper = new Looper();
 	private Looper disabledLooper = new Looper();
 	
 	private RobotState robotState = RobotState.getInstance();
 	private LimelightProcessor limelight = LimelightProcessor.getInstance();
-	private CameraServer cam;
 	
 	private Xbox driver, coDriver;
 
@@ -123,12 +121,10 @@ public class Robot extends IterativeRobot {
 		subsystems.outputToSmartDashboard();
 		robotState.outputToSmartDashboard();
 		enabledLooper.outputToSmartDashboard();
-		//SmartDashboard.putNumber("Swerve Looper dt", swerveLooper.dt());
 		
 	}
 	
 	public void initCamera(){
-		cam = CameraServer.getInstance();
     	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
     	usbCamera.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
     	MjpegServer mjpegServer2 = new MjpegServer("serve_Blur", 1182);
@@ -147,7 +143,6 @@ public class Robot extends IterativeRobot {
 			transmitter.transmitCachedPaths();
 			
 			disabledLooper.stop();
-			//swerveLooper.start();
 			enabledLooper.start();
 			
 			limelight.setVisionMode();
@@ -185,10 +180,8 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void teleopInit(){
 		try{
-			//swerveLooper.stop();
 			disabledLooper.stop();
 			enabledLooper.start();
-			//swerveLooper.start();
 			superstructure.enableCompressor(true);
 			limelight.setDriverMode();
 			limelight.ledOn(false);
@@ -366,8 +359,6 @@ public class Robot extends IterativeRobot {
 				autoModeExecuter.stop();
 			enabledLooper.stop();
 			subsystems.stop();
-			//swerveLooper.stop();
-			//swerveLooper.start();
 			disabledLooper.start();
 			elevator.fireGasStruts(false);
 			elevator.fireLatch(false);
