@@ -14,8 +14,8 @@ public class Constants {
 	
 	public static final double kEpsilon = 0.0001;
 	
-	public static final boolean kIsUsingCompBot = false;
-	public static final boolean kIsUsingTractionWheels = false;
+	public static final boolean kIsUsingCompBot = true;
+	public static final boolean kIsUsingTractionWheels = true;
 	
 	//Physical Robot Dimensions
 	public static final double kRobotWidth = 39.0 / 12.0;
@@ -93,6 +93,9 @@ public class Constants {
 	
 	//Scrub Factors
 	public static final double[] kWheelScrubFactors = new double[]{1.0, 1.0, 1.0, 1.0};
+
+	//Voltage-Velocity equation constants
+	public static final double[][] kVoltageVelocityEquations = new double[][]{{1.75,-4.76,2.73}, {1.59,-3.83,2.4}, {1.72,-4.89,2.84}, {1.68,-4.8,2.85}};
 	
 	//Swerve Odometry Constants
 	public static final double kSwerveWheelDiameter = 3.93; //inches

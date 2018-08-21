@@ -21,6 +21,7 @@ import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.trajectory.TrajectoryIterator;
 import com.team254.lib.trajectory.timing.TimedState;
+import edu.wpi.first.wpilibj.Timer;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import jaci.pathfinder.Trajectory;
@@ -77,11 +78,12 @@ public class Swerve extends Subsystem{
 	}
 	boolean hasFinishedPath = false;
 	public boolean hasFinishedPath(){
-		return hasFinishedPath || motionPlanner.isDone();
+		return hasFinishedPath;
 	}
 	
 	DriveMotionPlanner motionPlanner;
 	double rotationScalar;
+	double trajectoryStartTime = 0;
 	
 	VectorField vf;
 	
@@ -286,10 +288,12 @@ public class Swerve extends Subsystem{
 	
 	public synchronized void setTrajectory(TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 			double rotationScalar){
+		hasFinishedPath = false;
 		motionPlanner.reset();
 		motionPlanner.setTrajectory(trajectory);
 		setAbsolutePathHeading(targetHeading);
 		this.rotationScalar = rotationScalar;
+		trajectoryStartTime = Timer.getFPGATimestamp();
 		setState(ControlState.TRAJECTORY);
 	}
 	
@@ -519,6 +523,10 @@ public class Swerve extends Subsystem{
 					Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.05), pose, false));
 				lastActiveVector = driveVector;
 			}else{
+				if(!hasFinishedPath){ 
+					System.out.println("Path completed in: " + (timestamp - trajectoryStartTime));
+					hasFinishedPath = true;
+				}
 				stop();
 			}
 			break;

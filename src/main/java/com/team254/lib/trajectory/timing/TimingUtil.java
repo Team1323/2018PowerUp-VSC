@@ -18,14 +18,15 @@ public class TimingUtil {
             double end_velocity,
             double max_velocity,
             double max_abs_acceleration,
-            double max_deceleration) {
+            double max_deceleration,
+            int slowdown_chunks) {
         final int num_states = (int) Math.ceil(distance_view.last_interpolant() / step_size + 1);
         List<S> states = new ArrayList<>(num_states);
         for (int i = 0; i < num_states; ++i) {
             states.add(distance_view.sample(Math.min(i * step_size, distance_view.last_interpolant())).state());
         }
         return timeParameterizeTrajectory(reverse, states, constraints, start_velocity, end_velocity,
-                max_velocity, max_abs_acceleration, max_deceleration);
+                max_velocity, max_abs_acceleration, max_deceleration, slowdown_chunks);
     }
 
     public static <S extends State<S>> Trajectory<TimedState<S>> timeParameterizeTrajectory(
@@ -36,7 +37,8 @@ public class TimingUtil {
             double end_velocity,
             double max_velocity,
             double max_abs_acceleration,
-            double max_deceleration) {
+            double max_deceleration,
+            int slowdown_chunks) {
         List<ConstrainedState<S>> constraint_states = new ArrayList<>(states.size());
         final double kEpsilon = 1e-6;
 
@@ -143,7 +145,7 @@ public class TimingUtil {
             ConstrainedState<S> constraint_state = constraint_states.get(i);
             final double ds = constraint_state.distance - successor.distance; // will be negative.
 
-            if(i == states.size() - 2) constraint_state.min_acceleration = -max_deceleration;
+            if(i >= states.size() - slowdown_chunks) constraint_state.min_acceleration = -max_deceleration;
 
             while (true) {
                 // Enforce reverse max reachable velocity limit.

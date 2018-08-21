@@ -81,6 +81,7 @@ public class Elevator extends Subsystem{
 		
 		master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		master.setSensorPhase(true);
+		zeroSensors();
 		master.configReverseSoftLimitThreshold(Constants.kElevatorEncoderStartingPosition, 10);
 		master.configForwardSoftLimitThreshold(Constants.kElevatorEncoderStartingPosition + feetToEncUnits(Constants.kElevatorMaxHeight), 10);
 		master.configForwardSoftLimitEnable(true, 10);
@@ -196,7 +197,7 @@ public class Elevator extends Subsystem{
 			heightFeet = Constants.kElevatorMinHeight;
 		if(!isHighGear)
 			configForLifting();
-		if(isSensorConnected()){
+		if(/*isSensorConnected()*/true){
 			if(heightFeet > getHeight())
 				master.selectProfileSlot(0, 0);
 			else
@@ -239,7 +240,7 @@ public class Elevator extends Subsystem{
 	
 	public synchronized void lockHeight(){
 		setState(ControlState.Locked);
-		if(isSensorConnected()){
+		if(/*isSensorConnected()*/true){
 			targetHeight = getHeight();
 			periodicIO.demand = periodicIO.position;
 		}else{

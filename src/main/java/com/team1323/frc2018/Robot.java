@@ -95,12 +95,10 @@ public class Robot extends IterativeRobot {
 		Logger.clearLog();
 
 		subsystems.registerEnabledLoops(enabledLooper);
-		subsystems.registerDisabledLoops(disabledLooper);
-		enabledLooper.register(LimelightProcessor.getInstance());
+		//subsystems.registerDisabledLoops(disabledLooper);
 		enabledLooper.register(RobotStateEstimator.getInstance());
 		enabledLooper.register(PathTransmitter.getInstance());
 		enabledLooper.register(QuinticPathTransmitter.getInstance());
-		disabledLooper.register(LimelightProcessor.getInstance());
 		disabledLooper.register(RobotStateEstimator.getInstance());
 		disabledLooper.register(PathTransmitter.getInstance());
 		disabledLooper.register(QuinticPathTransmitter.getInstance());
@@ -113,8 +111,8 @@ public class Robot extends IterativeRobot {
 		generator.generateTrajectories();
 
 		//qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
-		//qTransmitter.addPaths(LeftScaleMode.getPaths());
-		qTransmitter.addPath(generator.getTrajectorySet().startToRightScale);
+		qTransmitter.addPaths(LeftScaleMode.getPaths());
+		//qTransmitter.addPath(generator.getTrajectorySet().startToRightScale);
 	}
 	
 	public void allPeriodic(){
@@ -144,9 +142,6 @@ public class Robot extends IterativeRobot {
 			
 			disabledLooper.stop();
 			enabledLooper.start();
-			
-			limelight.setVisionMode();
-			limelight.ledOn(true);
 			
 			superstructure.elevator.setCurrentLimit(20);
 			superstructure.elevator.configForAutoSpeed();
@@ -183,8 +178,6 @@ public class Robot extends IterativeRobot {
 			disabledLooper.stop();
 			enabledLooper.start();
 			superstructure.enableCompressor(true);
-			limelight.setDriverMode();
-			limelight.ledOn(false);
 			swerve.setNominalDriveOutput(0.0);
 			superstructure.elevator.setCurrentLimit(30);
 			superstructure.elevator.configForTeleopSpeed();
@@ -328,7 +321,8 @@ public class Robot extends IterativeRobot {
 			}else if(driver.POV180.wasPressed() && !elevator.isHighGear()){
 				superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
 			}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){
-				superstructure.flipDriveTrain();
+				//flip is disabled for now, due to our adoption of forks for CC
+				//superstructure.flipDriveTrain();
 			}
 			
 			if(intake.needsToNotifyDrivers()){

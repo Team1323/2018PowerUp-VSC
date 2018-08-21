@@ -66,8 +66,10 @@ public class TrajectoryGenerator {
             double max_accel,  // inches/s^2
             double max_decel,
             double max_voltage,
-            double default_vel) {
-        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, max_vel, max_accel, max_decel, max_voltage, default_vel);
+            double default_vel,
+            int slowdown_chunks) {
+        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, max_vel, max_accel, max_decel, max_voltage, 
+            default_vel, slowdown_chunks);
     }
 
     public Trajectory<TimedState<Pose2dWithCurvature>> generateTrajectory(
@@ -80,8 +82,10 @@ public class TrajectoryGenerator {
             double max_accel,  // inches/s^2
             double max_decel,
             double max_voltage,
-            double default_vel) {
-        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, start_vel, end_vel, max_vel, max_accel, max_decel, max_voltage, default_vel);
+            double default_vel,
+            int slowdown_chunks) {
+        return mMotionPlanner.generateTrajectory(reversed, waypoints, constraints, start_vel, end_vel, max_vel, max_accel, max_decel, max_voltage, 
+            default_vel, slowdown_chunks);
     }
 
     // CRITICAL POSES
@@ -122,7 +126,7 @@ public class TrajectoryGenerator {
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
 
             //startToRightScale = convertPath(PathManager.mStartToRightScale, 4.0/*, Arrays.asList(new CurvatureVelocityConstraint())*/);
-            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 8.0);
+            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 8.0, 3);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
@@ -147,6 +151,6 @@ public class TrajectoryGenerator {
     public Trajectory<TimedState<Pose2dWithCurvature>> convertPath(PathfinderPath path, double defaultCook,
     List<TimingConstraint<Pose2dWithCurvature>> constraints){
         return generateTrajectory(false, convertWaypoints(path), constraints, 
-            path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage, defaultCook);
+            path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage, defaultCook, 1);
     }
 }

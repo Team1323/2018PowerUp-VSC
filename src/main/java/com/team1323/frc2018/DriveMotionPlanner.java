@@ -23,7 +23,7 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveMotionPlanner implements CSVWritable {
-    private static final double kMaxDx = 2.0;
+    private static final double kMaxDx = 2.0000000001;//2.0
     private static final double kMaxDy = 0.25;
     private static final double kMaxDTheta = Math.toRadians(5.0);
     
@@ -89,8 +89,10 @@ public class DriveMotionPlanner implements CSVWritable {
             double max_accel,  // inches/s^2
             double max_decel,
             double max_voltage,
-            double default_vel) {
-        return generateTrajectory(reversed, waypoints, constraints, 0.0, 0.0, max_vel, max_accel, max_decel, max_voltage, default_vel);
+            double default_vel,
+            int slowdown_chunks) {
+        return generateTrajectory(reversed, waypoints, constraints, 0.0, 0.0, max_vel, max_accel, max_decel, max_voltage, 
+            default_vel, slowdown_chunks);
     }
 
     public Trajectory<TimedState<Pose2dWithCurvature>> generateTrajectory(
@@ -103,7 +105,8 @@ public class DriveMotionPlanner implements CSVWritable {
             double max_accel,  // inches/s^2
             double max_decel,
             double max_voltage,
-            double default_vel) {
+            double default_vel,
+            int slowdown_chunks) {
         List<Pose2d> waypoints_maybe_flipped = waypoints;
         final Pose2d flip = Pose2d.fromRotation(new Rotation2d(-1, 0, false));
         // TODO re-architect the spline generator to support reverse.
@@ -137,7 +140,8 @@ public class DriveMotionPlanner implements CSVWritable {
         // Generate the timed trajectory.
         Trajectory<TimedState<Pose2dWithCurvature>> timed_trajectory = TimingUtil.timeParameterizeTrajectory
                 (reversed, new
-                        DistanceView<>(trajectory), kMaxDx, all_constraints, start_vel, end_vel, max_vel, max_accel, max_decel);
+                        DistanceView<>(trajectory), kMaxDx, all_constraints, start_vel, end_vel, max_vel, max_accel, 
+                        max_decel, slowdown_chunks);
         timed_trajectory.setDefaultVelocity(default_vel / Constants.kSwerveMaxSpeedFeetPerSecond);
         return timed_trajectory;
     }

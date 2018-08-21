@@ -62,7 +62,7 @@ public class QuinticPathTransmitter implements Loop{
 		t = timestamp - startingTime;
 		TimedState<Pose2dWithCurvature> state = currentTrajectory.preview(t).state();
 		Translation2d pos = state.state().getTranslation();
-		SmartDashboard.putNumberArray("Path Pose", new double[]{pos.x(), pos.y(), 0.0, state.velocity() / Constants.kSwerveMaxSpeedFeetPerSecond});
+		SmartDashboard.putNumberArray("Path Pose", new double[]{pos.x(), pos.y(), 0.0, Math.abs(state.acceleration()) / 10.0});// yeet Constants.kSwerveMaxSpeedFeetPerSecond});
 		
 		//System.out.println("Accel: " + state.acceleration());
 		if(state.acceleration() < minAccel)
