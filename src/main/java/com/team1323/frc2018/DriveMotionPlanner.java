@@ -224,7 +224,6 @@ public class DriveMotionPlanner implements CSVWritable {
         mDt = timestamp - mLastTime;
         mLastTime = timestamp;
         
-        double minimizedDistance = distance(current_state, 0.0);
         double searchStepSize = 1.0;
         double previewQuantity = 0.0;
     	double searchDirection = 1.0;
@@ -232,12 +231,6 @@ public class DriveMotionPlanner implements CSVWritable {
     	double reverseDistance = distance(current_state, previewQuantity - searchStepSize);
     	searchDirection = Math.signum(reverseDistance - forwardDistance);
         while(searchStepSize > 0.001){
-/*        	for(double progress = previewQuantity; 
-        			(searchDirection == 1.0) ? (progress <= mCurrentTrajectory.getRemainingProgress()) : (-progress < mCurrentTrajectory.getProgress()); 
-        			progress += (searchStepSize * searchDirection)){
-        		double distance = distance(current_state, progress);
-        		if(distance < minimizedDistance) previewQuantity = progress;
-        	}/**/
         	if(Util.epsilonEquals(distance(current_state, previewQuantity), 0.0, 0.001)) break;
         	while(/* next point is closer than current point */ distance(current_state, previewQuantity + searchStepSize*searchDirection) < 
         			distance(current_state, previewQuantity)) {

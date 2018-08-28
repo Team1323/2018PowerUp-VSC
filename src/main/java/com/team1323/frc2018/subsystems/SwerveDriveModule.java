@@ -102,11 +102,11 @@ public class SwerveDriveModule extends Subsystem{
     	driveMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
     	driveMotor.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_10Ms, 10);
     	driveMotor.configVelocityMeasurementWindow(32, 10);
-    	driveMotor.configNominalOutputForward(0.0, 10);//1.5/12.0
-    	driveMotor.configNominalOutputReverse(0.0, 10);//-1.5/12.0
+    	driveMotor.configNominalOutputForward(1.5/12.0, 10);//1.5/12.0
+    	driveMotor.configNominalOutputReverse(-1.5/12.0, 10);//-1.5/12.0
     	driveMotor.configVoltageCompSaturation(12.0, 10);
     	driveMotor.enableVoltageCompensation(true);
-    	driveMotor.configOpenloopRamp(96.0, 10);//0.25
+    	driveMotor.configOpenloopRamp(0.25, 10);//0.25
     	driveMotor.configAllowableClosedloopError(0, 0, 10);
     	driveMotor.setInverted(false);
     	driveMotor.setSensorPhase(false);
@@ -251,12 +251,12 @@ public class SwerveDriveModule extends Subsystem{
 	public synchronized void readPeriodicInputs() {
 		periodicIO.rotationPosition = rotationMotor.getSelectedSensorPosition(0);
 		if(useDriveEncoder) periodicIO.drivePosition = driveMotor.getSelectedSensorPosition(0);
-		if(moduleID == 3){
+		/*if(moduleID == 3){
 			periodicIO.velocity = driveMotor.getSelectedSensorVelocity(0);
 			periodicIO.driveVoltage = driveMotor.getMotorOutputVoltage();
 			if(periodicIO.velocity != 0 && periodicIO.driveVoltage != 0)
 				Logger.log("(" + periodicIO.driveVoltage + ", " + encVelocityToFeetPerSecond(periodicIO.velocity) + "), ");
-		}
+		}*/
 	}
 
 	@Override

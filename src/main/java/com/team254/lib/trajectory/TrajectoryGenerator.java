@@ -117,20 +117,26 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateSecondLeftCubeToScale;
 
         public final Trajectory<TimedState<Pose2dWithCurvature>> startToRightScale;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> rightScaleToFirstCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> alternateRightCubeToRightScale;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> alternateRightScaleToSecondCube;
 
         private TrajectorySet() {
             startToLeftScale = getStartToLeftScale();
-            alternateLeftmostCube = convertPath(PathManager.mAlternateLeftmostCube, 1.9);
+            alternateLeftmostCube = convertPath(PathManager.mAlternateLeftmostCube, 3.8);
             derpLeftCubeToLeftScale = convertPath(PathManager.mDerpLeftCubeToLeftScale, 3.5);
             alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube, 4.7);
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
 
-            //startToRightScale = convertPath(PathManager.mStartToRightScale, 4.0/*, Arrays.asList(new CurvatureVelocityConstraint())*/);
             startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 8.0, 3);
+            rightScaleToFirstCube = convertPath(PathManager.mRightScaleToFirstCube, 3.75);
+            alternateRightCubeToRightScale = convertPath(PathManager.mAlternateRightCubeToRightScale, 4.75);
+            alternateRightScaleToSecondCube = convertPath(PathManager.mAlternateRightScaleToSecondCube, 5.5);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
-            return convertPath(PathManager.mStartToLeftScale, 5.5);
+            //return convertPath(PathManager.mStartToLeftScale, 6.25);
+            return generateTrajectory(false, convertWaypoints(PathManager.mStartToLeftScale), Arrays.asList(), 8.0, 6.0, 2.0, kMaxVoltage, 7.0, 1);
         }
 
 

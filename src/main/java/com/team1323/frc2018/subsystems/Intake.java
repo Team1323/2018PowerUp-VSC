@@ -54,11 +54,11 @@ public class Intake extends Subsystem{
 		leftIntake.configContinuousCurrentLimit(20, 10);
 		leftIntake.configPeakCurrentLimit(30, 10);
 		leftIntake.configPeakCurrentDuration(10, 10);
-		leftIntake.enableCurrentLimit(false);
+		leftIntake.enableCurrentLimit(true);
 		rightIntake.configContinuousCurrentLimit(20, 10);
 		rightIntake.configPeakCurrentLimit(30, 10);
 		rightIntake.configPeakCurrentDuration(10, 10);
-		rightIntake.enableCurrentLimit(false);
+		rightIntake.enableCurrentLimit(true);
 		leftIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20, 10);
 		leftIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20, 10);
 		rightIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20, 10);

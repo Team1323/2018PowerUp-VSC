@@ -1,12 +1,12 @@
 package com.team1323.frc2018.auto.modes;
 
 import java.util.Arrays;
+import java.util.List;
 
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.auto.AutoModeBase;
 import com.team1323.frc2018.auto.AutoModeEndedException;
 import com.team1323.frc2018.auto.actions.DriveStraightAction;
-import com.team1323.frc2018.auto.actions.FollowPathAction;
 import com.team1323.frc2018.auto.actions.ResetPoseAction;
 import com.team1323.frc2018.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2018.auto.actions.WaitAction;
@@ -16,17 +16,14 @@ import com.team1323.frc2018.auto.actions.WaitForWallAction;
 import com.team1323.frc2018.auto.actions.WaitToFinishPathAction;
 import com.team1323.frc2018.auto.actions.WaitToIntakeCubeAction;
 import com.team1323.frc2018.auto.actions.WaitToPassXCoordinateAction;
-import com.team1323.frc2018.pathfinder.PathManager;
 import com.team1323.frc2018.subsystems.Intake;
 import com.team1323.frc2018.subsystems.Intake.IntakeState;
 import com.team1323.frc2018.subsystems.Superstructure;
 import com.team1323.frc2018.subsystems.Swerve;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
-import com.team254.lib.trajectory.timing.TimedState;
-import java.util.List;
-import java.util.ArrayList;
 import com.team254.lib.trajectory.Trajectory;
+import com.team254.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.wpilibj.Timer;
 
@@ -53,7 +50,7 @@ public class LeftScaleMode extends AutoModeBase{
 		s.request(intake.stateRequest(IntakeState.CLAMPING));
 		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 50.0, 0.5));
 		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x()));
-		s.request(s.elevatorWristConfig(4.5, 66.0));//66 4.5
+		s.request(s.elevatorWristConfig(4.5, 66.0));
 		runAction(new WaitToFinishPathAction());
 		s.request(intake.ejectRequest(Constants.kIntakeStrongEjectOutput));
 		System.out.println("First Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));

@@ -12,6 +12,7 @@ import java.util.Arrays;
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
 import com.team1323.frc2018.auto.modes.LeftScaleMode;
+import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.loops.LimelightProcessor;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
@@ -95,7 +96,7 @@ public class Robot extends IterativeRobot {
 		Logger.clearLog();
 
 		subsystems.registerEnabledLoops(enabledLooper);
-		//subsystems.registerDisabledLoops(disabledLooper);
+		subsystems.registerDisabledLoops(disabledLooper);
 		enabledLooper.register(RobotStateEstimator.getInstance());
 		enabledLooper.register(PathTransmitter.getInstance());
 		enabledLooper.register(QuinticPathTransmitter.getInstance());
@@ -110,9 +111,8 @@ public class Robot extends IterativeRobot {
 		
 		generator.generateTrajectories();
 
-		//qTransmitter.addPath(generator.getTrajectorySet().sideStartToFarScale.get(false));
-		qTransmitter.addPaths(LeftScaleMode.getPaths());
-		//qTransmitter.addPath(generator.getTrajectorySet().startToRightScale);
+		//qTransmitter.addPaths(LeftScaleMode.getPaths());
+		qTransmitter.addPaths(RightScaleMode.getPaths());
 	}
 	
 	public void allPeriodic(){
@@ -319,10 +319,11 @@ public class Robot extends IterativeRobot {
 						Constants.kWristPrimaryStowAngle, IntakeState.OPEN),
 						new RequestList(elevator.gearShiftRequest(false)));
 			}else if(driver.POV180.wasPressed() && !elevator.isHighGear()){
-				superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
+				//superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
 			}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){
 				//flip is disabled for now, due to our adoption of forks for CC
 				//superstructure.flipDriveTrain();
+				elevator.toggleForks();
 			}
 			
 			if(intake.needsToNotifyDrivers()){
@@ -354,8 +355,8 @@ public class Robot extends IterativeRobot {
 			enabledLooper.stop();
 			subsystems.stop();
 			disabledLooper.start();
-			elevator.fireGasStruts(false);
 			elevator.fireLatch(false);
+			elevator.fireForks(false);
 		}catch(Throwable t){
 			CrashTracker.logThrowableCrash(t);
 			throw t;

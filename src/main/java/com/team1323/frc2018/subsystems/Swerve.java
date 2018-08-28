@@ -520,7 +520,7 @@ public class Swerve extends Subsystem{
 				if(Util.epsilonEquals(driveVector.norm(), 0.0, Constants.kEpsilon))
 					driveVector = lastActiveVector;
 				setDriveOutput(inverseKinematics.updateDriveVectors(driveVector, 
-					Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.05), pose, false));
+					Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.01), pose, false));
 				lastActiveVector = driveVector;
 			}else{
 				if(!hasFinishedPath){ 

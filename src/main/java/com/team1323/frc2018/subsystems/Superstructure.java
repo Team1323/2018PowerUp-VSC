@@ -251,7 +251,6 @@ public class Superstructure extends Subsystem{
 	 */
 	public synchronized void flipDriveTrain(){
 		if(!elevator.isHighGear()){
-			elevator.fireGasStruts(true);
 			elevator.fireLatch(true);
 			elevator.setHangingLimits();
 			swerve.disable();

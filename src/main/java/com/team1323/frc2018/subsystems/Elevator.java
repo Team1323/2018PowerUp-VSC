@@ -24,7 +24,7 @@ public class Elevator extends Subsystem{
 	}
 	
 	LazyTalonSRX master, motor2, motor3;
-	Solenoid shifter, latch, gasStruts;
+	Solenoid shifter, latch, forks;
 	private double targetHeight = 0.0;
 	private boolean isHighGear = true;
 	public boolean isHighGear(){
@@ -70,7 +70,7 @@ public class Elevator extends Subsystem{
 		
 		shifter = new Solenoid(20, Ports.ELEVATOR_SHIFTER);
 		latch = new Solenoid(20, Ports.ELEVATOR_RELEASE_PISTON);
-		gasStruts = new Solenoid(20, Ports.GAS_STRUTS);
+		forks = new Solenoid(20, Ports.FORKS);
 		
 		master.configVoltageCompSaturation(12.0, 10);
 		master.enableVoltageCompensation(true);
@@ -172,12 +172,16 @@ public class Elevator extends Subsystem{
 		motor3.enableCurrentLimit(true);
 	}
 	
-	public void fireGasStruts(boolean fire){
-		gasStruts.set(fire);
-	}
-	
 	public void fireLatch(boolean fire){
 		latch.set(fire);
+	}
+
+	public void fireForks(boolean fire){
+		forks.set(fire);
+	}
+
+	public void toggleForks(){
+		forks.set(!forks.get());
 	}
 	
 	public void setOpenLoop(double output){
