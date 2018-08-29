@@ -11,7 +11,9 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
+import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
 import com.team1323.frc2018.auto.modes.LeftScaleMode;
+import com.team1323.frc2018.auto.modes.RightFrontSwitchMode;
 import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.loops.LimelightProcessor;
 import com.team1323.frc2018.loops.Looper;
@@ -68,7 +70,6 @@ public class Robot extends IterativeRobot {
 	private Looper disabledLooper = new Looper();
 	
 	private RobotState robotState = RobotState.getInstance();
-	private LimelightProcessor limelight = LimelightProcessor.getInstance();
 	
 	private Xbox driver, coDriver;
 
@@ -113,6 +114,8 @@ public class Robot extends IterativeRobot {
 
 		//qTransmitter.addPaths(LeftScaleMode.getPaths());
 		qTransmitter.addPaths(RightScaleMode.getPaths());
+		//qTransmitter.addPaths(LeftFrontSwitchMode.getPaths());
+		//qTransmitter.addPaths(RightFrontSwitchMode.getPaths());
 	}
 	
 	public void allPeriodic(){

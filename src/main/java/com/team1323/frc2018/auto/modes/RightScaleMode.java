@@ -19,7 +19,6 @@ import com.team1323.frc2018.subsystems.Intake;
 import com.team1323.frc2018.subsystems.Intake.IntakeState;
 import com.team1323.frc2018.subsystems.Superstructure;
 import com.team1323.frc2018.subsystems.Swerve;
-import com.team1323.frc2018.subsystems.Wrist;
 import com.team254.lib.geometry.Pose2dWithCurvature;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.trajectory.Trajectory;

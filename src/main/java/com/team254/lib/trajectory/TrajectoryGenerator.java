@@ -110,16 +110,36 @@ public class TrajectoryGenerator {
             public final Trajectory<TimedState<Pose2dWithCurvature>> right;
         }
 
+        //Left Scale Auto
         public final Trajectory<TimedState<Pose2dWithCurvature>> startToLeftScale;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateLeftmostCube;
         public final Trajectory<TimedState<Pose2dWithCurvature>> derpLeftCubeToLeftScale;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateLeftScaleToSecondCube;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateSecondLeftCubeToScale;
 
+        //Right Scale Auto
         public final Trajectory<TimedState<Pose2dWithCurvature>> startToRightScale;
         public final Trajectory<TimedState<Pose2dWithCurvature>> rightScaleToFirstCube;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateRightCubeToRightScale;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateRightScaleToSecondCube;
+
+        //Left Switch Auto
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontLeftSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontLeftSwitchToOuterCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> outerCubeToFrontLeftSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontLeftSwitchToMiddleCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToFrontLeftSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontLeftSwitchToDropoff;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontLeftSwitchToBottomMiddle;
+
+        //Right Switch Auto
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToOuterCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> outerCubeToFrontRightSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToMiddleCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToFrontRightSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToDropoff;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToBottomMiddle;
 
         private TrajectorySet() {
             startToLeftScale = getStartToLeftScale();
@@ -132,6 +152,22 @@ public class TrajectoryGenerator {
             rightScaleToFirstCube = convertPath(PathManager.mRightScaleToFirstCube, 3.75);
             alternateRightCubeToRightScale = convertPath(PathManager.mAlternateRightCubeToRightScale, 4.75);
             alternateRightScaleToSecondCube = convertPath(PathManager.mAlternateRightScaleToSecondCube, 5.5);
+
+            frontLeftSwitch = convertPath(PathManager.mFrontLeftSwitch, 2.0);
+            frontLeftSwitchToOuterCube = convertPath(PathManager.mFrontLeftSwitchToOuterCube, 2.0);
+            outerCubeToFrontLeftSwitch = convertPath(PathManager.mOuterCubeToFrontLeftSwitch, 2.0);
+            frontLeftSwitchToMiddleCube = convertPath(PathManager.mFrontLeftSwitchToMiddleCube, 2.0);
+            middleCubeToFrontLeftSwitch = convertPath(PathManager.mMiddleCubeToFrontLeftSwitch, 2.0);
+            frontLeftSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
+            frontLeftSwitchToBottomMiddle = convertPath(PathManager.mFrontLeftSwitchToBottomMiddle, 2.0);
+
+            frontRightSwitch = convertPath(PathManager.mFrontRightSwitch, 2.0);
+            frontRightSwitchToOuterCube = convertPath(PathManager.mFrontRightSwitchToOuterCube, 2.0);
+            outerCubeToFrontRightSwitch = convertPath(PathManager.mOuterCubeToFrontRightSwitch, 2.0);
+            frontRightSwitchToMiddleCube = convertPath(PathManager.mFrontRightSwitchToMiddleCube, 2.0);
+            middleCubeToFrontRightSwitch = convertPath(PathManager.mMiddleCubeToFrontRightSwitch, 2.0);
+            frontRightSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
+            frontRightSwitchToBottomMiddle = convertPath(PathManager.mFrontRightSwitchToBottomMiddle, 2.0);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
