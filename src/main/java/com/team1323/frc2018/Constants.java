@@ -46,6 +46,7 @@ public class Constants {
 	
 	public static final Pose2d kRobotStartingPose = new Pose2d(new Translation2d(Constants.kRobotHalfLength, Constants.kAutoStartingCorner.y() + Constants.kRobotHalfWidth), Rotation2d.fromDegrees(0));
 	public static final Pose2d kRobotLeftStartingPose = new Pose2d(new Translation2d(Constants.kRobotHalfWidth, 5.5 - Constants.kRobotHalfLength), Rotation2d.fromDegrees(-90));
+	public static final Pose2d kRobotAssistStartingPose = new Pose2d(kRobotLeftStartingPose.getTranslation(), Rotation2d.fromDegrees(90.0));
 	
 	//Swerve Calculations Constants (measurements are in feet)
     public static final double kWheelbaseLength = 18.5 / 12.0;

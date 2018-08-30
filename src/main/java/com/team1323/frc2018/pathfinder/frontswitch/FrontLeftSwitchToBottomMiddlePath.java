@@ -11,7 +11,7 @@ public class FrontLeftSwitchToBottomMiddlePath extends PathfinderPath{
 	public FrontLeftSwitchToBottomMiddlePath(){
 		super.points = new Waypoint[]{
 			new Waypoint(Constants.kLeftSwitchCloseCorner.x() - Constants.kRobotHalfLength - 0.25, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 0.5, Pathfinder.d2r(150)),
-			new Waypoint(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 4.25, Pathfinder.d2r(90))
+			new Waypoint(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.25, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 4.25, Pathfinder.d2r(90))
 		};
 		super.maxAccel = 9.0;
 		super.defaultSpeed = 4.3;

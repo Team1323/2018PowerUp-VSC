@@ -11,11 +11,7 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
-import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
-import com.team1323.frc2018.auto.modes.LeftScaleMode;
-import com.team1323.frc2018.auto.modes.RightFrontSwitchMode;
 import com.team1323.frc2018.auto.modes.RightScaleMode;
-import com.team1323.frc2018.loops.LimelightProcessor;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -38,7 +34,6 @@ import com.team254.lib.trajectory.TrajectoryIterator;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
-import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.IterativeRobot;
@@ -114,6 +109,7 @@ public class Robot extends IterativeRobot {
 
 		//qTransmitter.addPaths(LeftScaleMode.getPaths());
 		qTransmitter.addPaths(RightScaleMode.getPaths());
+		//qTransmitter.addPaths(LeftScaleAssistMode.getPaths());
 		//qTransmitter.addPaths(LeftFrontSwitchMode.getPaths());
 		//qTransmitter.addPaths(RightFrontSwitchMode.getPaths());
 	}

@@ -93,7 +93,10 @@ public class TrajectoryGenerator {
     // +x is towards the center of the field.
     // +y is to the left.
     // ALL POSES DEFINED FOR THE CASE THAT ROBOT STARTS ON RIGHT! (mirrored about +x axis for LEFT)
-    public static final Pose2d kSideStartPose = Pose2d.fromTranslation(new Translation2d(Constants.kRobotHalfWidth, 27.0 - (5.5 - Constants.kRobotHalfLength)));
+    public static final Pose2d kSideStartPose = Pose2d.fromTranslation(new Translation2d(Constants.kRobotHalfWidth, 5.5 - Constants.kRobotHalfLength));
+
+    public static final Pose2d kLeftScaleScorePose = new Pose2d(new Translation2d(22.75, Constants.kLeftSwitchCloseCorner.y() - Constants.kRobotHalfLength - 1.0),
+        Rotation2d.fromDegrees(0.0));
 
     public class TrajectorySet {
         public class MirroredTrajectory {
@@ -141,6 +144,9 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToDropoff;
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToBottomMiddle;
 
+        //Poof assist scale auto
+        public final Trajectory<TimedState<Pose2dWithCurvature>> backOffLeftScale;
+
         private TrajectorySet() {
             startToLeftScale = getStartToLeftScale();
             alternateLeftmostCube = convertPath(PathManager.mAlternateLeftmostCube, 3.8);
@@ -153,21 +159,23 @@ public class TrajectoryGenerator {
             alternateRightCubeToRightScale = convertPath(PathManager.mAlternateRightCubeToRightScale, 4.75);
             alternateRightScaleToSecondCube = convertPath(PathManager.mAlternateRightScaleToSecondCube, 5.5);
 
-            frontLeftSwitch = convertPath(PathManager.mFrontLeftSwitch, 2.0);
-            frontLeftSwitchToOuterCube = convertPath(PathManager.mFrontLeftSwitchToOuterCube, 2.0);
-            outerCubeToFrontLeftSwitch = convertPath(PathManager.mOuterCubeToFrontLeftSwitch, 2.0);
-            frontLeftSwitchToMiddleCube = convertPath(PathManager.mFrontLeftSwitchToMiddleCube, 2.0);
-            middleCubeToFrontLeftSwitch = convertPath(PathManager.mMiddleCubeToFrontLeftSwitch, 2.0);
+            frontLeftSwitch = convertPath(PathManager.mFrontLeftSwitch, 6.0);
+            frontLeftSwitchToOuterCube = convertPath(PathManager.mFrontLeftSwitchToOuterCube, 5.75);
+            outerCubeToFrontLeftSwitch = convertPath(PathManager.mOuterCubeToFrontLeftSwitch, 5.5);
+            frontLeftSwitchToMiddleCube = convertPath(PathManager.mFrontLeftSwitchToMiddleCube, 6.25);
+            middleCubeToFrontLeftSwitch = convertPath(PathManager.mMiddleCubeToFrontLeftSwitch, 6.0);
             frontLeftSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
-            frontLeftSwitchToBottomMiddle = convertPath(PathManager.mFrontLeftSwitchToBottomMiddle, 2.0);
+            frontLeftSwitchToBottomMiddle = convertPath(PathManager.mFrontLeftSwitchToBottomMiddle, 5.75);
 
-            frontRightSwitch = convertPath(PathManager.mFrontRightSwitch, 2.0);
-            frontRightSwitchToOuterCube = convertPath(PathManager.mFrontRightSwitchToOuterCube, 2.0);
-            outerCubeToFrontRightSwitch = convertPath(PathManager.mOuterCubeToFrontRightSwitch, 2.0);
-            frontRightSwitchToMiddleCube = convertPath(PathManager.mFrontRightSwitchToMiddleCube, 2.0);
-            middleCubeToFrontRightSwitch = convertPath(PathManager.mMiddleCubeToFrontRightSwitch, 2.0);
+            frontRightSwitch = convertPath(PathManager.mFrontRightSwitch, 6.75);
+            frontRightSwitchToOuterCube = convertPath(PathManager.mFrontRightSwitchToOuterCube, 5.75);
+            outerCubeToFrontRightSwitch = convertPath(PathManager.mOuterCubeToFrontRightSwitch, 5.5);
+            frontRightSwitchToMiddleCube = convertPath(PathManager.mFrontRightSwitchToMiddleCube, 6.5);
+            middleCubeToFrontRightSwitch = convertPath(PathManager.mMiddleCubeToFrontRightSwitch, 5.75);
             frontRightSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
-            frontRightSwitchToBottomMiddle = convertPath(PathManager.mFrontRightSwitchToBottomMiddle, 2.0);
+            frontRightSwitchToBottomMiddle = convertPath(PathManager.mFrontRightSwitchToBottomMiddle, 4.25);
+
+            backOffLeftScale = getBackOffLeftScale();
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
@@ -175,7 +183,13 @@ public class TrajectoryGenerator {
             return generateTrajectory(false, convertWaypoints(PathManager.mStartToLeftScale), Arrays.asList(), 8.0, 6.0, 2.0, kMaxVoltage, 7.0, 1);
         }
 
+        private Trajectory<TimedState<Pose2dWithCurvature>> getBackOffLeftScale(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kLeftScaleScorePose);
+            waypoints.add(kLeftScaleScorePose.transformBy(Pose2d.fromTranslation(new Translation2d(-7.0, -0.5))));
 
+            return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 6.0, 1);
+        }
     }
     
     public List<Pose2d> convertWaypoints(PathfinderPath path){

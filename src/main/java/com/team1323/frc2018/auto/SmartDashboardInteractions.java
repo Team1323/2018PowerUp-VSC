@@ -1,6 +1,7 @@
 package com.team1323.frc2018.auto;
 
 import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
+import com.team1323.frc2018.auto.modes.LeftScaleAssistMode;
 import com.team1323.frc2018.auto.modes.LeftScaleMode;
 import com.team1323.frc2018.auto.modes.LeftSwitchLeftScaleMode;
 import com.team1323.frc2018.auto.modes.LeftSwitchRightScaleMode;
@@ -26,7 +27,8 @@ public class SmartDashboardInteractions {
     	modeChooser = new SendableChooser<AutoOption>();
     	modeChooser.addDefault("Switch and Scale", DEFAULT_MODE);
     	modeChooser.addObject("Switch Only", AutoOption.SWITCH_ONLY);
-    	modeChooser.addObject("Scale Only", AutoOption.SCALE_ONLY);
+		modeChooser.addObject("Scale Only", AutoOption.SCALE_ONLY);
+		modeChooser.addObject("Assist", AutoOption.ASSIST);
     	
     	SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
@@ -46,7 +48,8 @@ public class SmartDashboardInteractions {
     enum AutoOption{
     	SWITCH_AND_SCALE("Switch and Scale"),
     	SWITCH_ONLY("Switch Only"),
-    	SCALE_ONLY("Scale Only");
+		SCALE_ONLY("Scale Only"),
+		ASSIST("Assist");
     	
     	public final String name;
     	
@@ -100,7 +103,15 @@ public class SmartDashboardInteractions {
     			default:
     				System.out.println("ERROR: unexpected auto mode: " + option);
                     return new StandStillMode();
-    			}
+				}
+			case ASSIST:
+				switch(gameData){
+				case "LL":
+					return new LeftScaleAssistMode();
+				default:
+					System.out.println("ERROR: unexpected auto mode: " + option);
+					return new StandStillMode();
+				}
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();

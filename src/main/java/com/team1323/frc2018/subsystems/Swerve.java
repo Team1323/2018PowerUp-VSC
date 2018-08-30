@@ -246,13 +246,21 @@ public class Swerve extends Subsystem{
     		if(Util.shouldReverse(driveVectors.get(i).direction().getDegrees(), modules.get(i).getModuleAngle().getDegrees())){
     			modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees() + 180.0);
     			modules.get(i).setDriveOpenLoop(-driveVectors.get(i).norm());
-    			//modules.get(i).setVelocitySetpoint(-driveVectors.get(i).norm()*Constants.kSwerveMaxSpeedFeetPerSecond);
-    			//modules.get(i).setVelocitySetpoint(-8.0);
     		}else{
     			modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees());
     			modules.get(i).setDriveOpenLoop(driveVectors.get(i).norm());
-    			//modules.get(i).setVelocitySetpoint(driveVectors.get(i).norm()*Constants.kSwerveMaxSpeedFeetPerSecond);
-    			//modules.get(i).setVelocitySetpoint(8.0);
+    		}
+    	}
+	}
+
+	public void setModuleAngles(List<Translation2d> driveVectors){
+		for(int i=0; i<modules.size(); i++){
+    		if(Util.shouldReverse(driveVectors.get(i).direction().getDegrees(), modules.get(i).getModuleAngle().getDegrees())){
+    			modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees() + 180.0);
+    			modules.get(i).setDriveOpenLoop(0.0);
+    		}else{
+    			modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees());
+    			modules.get(i).setDriveOpenLoop(0.0);
     		}
     	}
 	}
@@ -519,8 +527,19 @@ public class Swerve extends Subsystem{
 				Translation2d driveVector = motionPlanner.update(timestamp, pose);
 				if(Util.epsilonEquals(driveVector.norm(), 0.0, Constants.kEpsilon))
 					driveVector = lastActiveVector;
-				setDriveOutput(inverseKinematics.updateDriveVectors(driveVector, 
+				if(modulesReady)
+					setDriveOutput(inverseKinematics.updateDriveVectors(driveVector, 
+						Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.01), pose, false));
+				else
+					setModuleAngles(inverseKinematics.updateDriveVectors(driveVector, 
 					Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.01), pose, false));
+
+				if(moduleAnglesOnTarget() && !modulesReady){
+					modules.forEach((m) -> m.resetLastEncoderReading());
+					modulesReady = true;
+					System.out.println("Modules Ready");
+				}
+				
 				lastActiveVector = driveVector;
 			}else{
 				if(!hasFinishedPath){ 
