@@ -156,9 +156,21 @@ public class SwerveDriveModule extends Subsystem{
 		periodicIO.rotationDemand = power;
 	}
 	
-	public void setDriveOpenLoop(double power){
+	/**
+	 * @param velocity Normalized value
+	 */
+	public void setDriveOpenLoop(double velocity){
+		double volts = 0.0;
+		if(!Util.epsilonEquals(velocity, 0.0, Constants.kEpsilon)){
+			velocity *= Constants.kSwerveMaxSpeedFeetPerSecond;
+			double m =  Constants.kVoltageVelocityEquations[moduleID][velocity < 0 ? 1 : 0][0];
+			double b = Constants.kVoltageVelocityEquations[moduleID][velocity < 0 ? 1 : 0][1];
+			volts = (velocity - b) / m;
+			volts = Util.deadBand(volts, 1.0);
+		}
+
 		periodicIO.driveControlMode = ControlMode.PercentOutput;
-		periodicIO.driveDemand = power;
+		periodicIO.driveDemand = volts / 12.0;
 	}
 	
 	public void setDrivePositionTarget(double deltaDistanceInches){

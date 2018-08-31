@@ -95,8 +95,13 @@ public class Constants {
 	//Scrub Factors
 	public static final double[] kWheelScrubFactors = new double[]{1.0, 1.0, 1.0, 1.0};
 
-	//Voltage-Velocity equation constants
-	public static final double[][] kVoltageVelocityEquations = new double[][]{{1.75,-4.76,2.73}, {1.59,-3.83,2.4}, {1.72,-4.89,2.84}, {1.68,-4.8,2.85}};
+	//Voltage-Velocity equation constants {m, b, x-intercept}
+	//First set is the positive direction, second set is negative
+	public static final double[][][] kVoltageVelocityEquations = new double[][][]{
+		{{1.70, -4.39, 2.58}, {1.83, 5.23, -2.85}}, 
+		{{1.59, -3.86, 2.42}, {1.43, 3.09, -2.16}}, 
+		{{1.53, -3.66, 2.39}, {1.66, 4.15, -2.50}}, 
+		{{1.84, -4.70, 2.56}, {1.85, 5.34, -2.89}}};
 	
 	//Swerve Odometry Constants
 	public static final double kSwerveWheelDiameter = 3.93; //inches

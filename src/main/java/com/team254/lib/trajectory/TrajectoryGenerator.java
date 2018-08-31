@@ -154,7 +154,7 @@ public class TrajectoryGenerator {
             alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube, 4.7);
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
 
-            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 8.0, 3);
+            startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 9.75, 3);
             rightScaleToFirstCube = convertPath(PathManager.mRightScaleToFirstCube, 3.75);
             alternateRightCubeToRightScale = convertPath(PathManager.mAlternateRightCubeToRightScale, 4.75);
             alternateRightScaleToSecondCube = convertPath(PathManager.mAlternateRightScaleToSecondCube, 5.5);

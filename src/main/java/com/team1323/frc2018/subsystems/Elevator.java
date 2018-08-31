@@ -201,13 +201,15 @@ public class Elevator extends Subsystem{
 			heightFeet = Constants.kElevatorMinHeight;
 		if(!isHighGear)
 			configForLifting();
-		if(/*isSensorConnected()*/true){
+		if(isSensorConnected()){
 			if(heightFeet > getHeight())
 				master.selectProfileSlot(0, 0);
 			else
 				master.selectProfileSlot(1, 0);
 			targetHeight = heightFeet;
 			periodicIO.demand = Constants.kElevatorEncoderStartingPosition + feetToEncUnits(heightFeet);
+			onTarget = false;
+			startTime = Timer.getFPGATimestamp();
 		}else{
 			DriverStation.reportError("Elevator encoder not detected!", false);
 			stop();
@@ -244,7 +246,7 @@ public class Elevator extends Subsystem{
 	
 	public synchronized void lockHeight(){
 		setState(ControlState.Locked);
-		if(/*isSensorConnected()*/true){
+		if(isSensorConnected()){
 			targetHeight = getHeight();
 			periodicIO.demand = periodicIO.position;
 		}else{
@@ -327,9 +329,18 @@ public class Elevator extends Subsystem{
 		return encUnitsToFeet(periodicIO.velocity) * 10.0;
 	}
 	
+	boolean onTarget = false;
+	double startTime = 0.0;
 	public boolean hasReachedTargetHeight(){
-		if(master.getControlMode() == ControlMode.MotionMagic)
-			return (Math.abs(targetHeight - getHeight()) <= Constants.kElevatorHeightTolerance);
+		if(master.getControlMode() == ControlMode.MotionMagic){
+			if((Math.abs(targetHeight - getHeight()) <= Constants.kElevatorHeightTolerance)){
+				if(!onTarget){
+					System.out.println("Elevator done in: " + (Timer.getFPGATimestamp() - startTime));
+					onTarget = true;
+				}
+				return true;
+			}
+		}
 		return false;
 	}
 	

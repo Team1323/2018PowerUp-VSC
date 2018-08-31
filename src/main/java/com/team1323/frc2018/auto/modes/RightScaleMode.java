@@ -53,7 +53,7 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new WaitToPassYCoordinateAction(17.0));
 		Swerve.getInstance().setAbsolutePathHeading(-40.0);
 		runAction(new WaitToFinishPathAction());
-		runAction(new WaitForElevatorAction());
+		//runAction(new WaitForElevatorAction());
 		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
@@ -79,7 +79,7 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new WaitAction(0.25));
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 55.0));
 		runAction(new WaitToFinishPathAction());
-		runAction(new WaitForElevatorAction());
+		//runAction(new WaitForElevatorAction());
 		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
 		System.out.println("Second cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
@@ -105,7 +105,7 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new WaitToFinishPathAction());*/
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 55.0));
 		runAction(new WaitToFinishPathAction());
-		runAction(new WaitForElevatorAction());
+		//runAction(new WaitForElevatorAction());
 		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
 		System.out.println("Third cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 	}
