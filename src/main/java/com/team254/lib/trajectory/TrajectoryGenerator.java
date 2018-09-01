@@ -98,6 +98,9 @@ public class TrajectoryGenerator {
     public static final Pose2d kLeftScaleScorePose = new Pose2d(new Translation2d(22.75, Constants.kLeftSwitchCloseCorner.y() - Constants.kRobotHalfLength - 1.0),
         Rotation2d.fromDegrees(0.0));
 
+    public static final Pose2d kSecondRightCubePose = new Pose2d(new Translation2d(Constants.kRightSwitchFarCorner.x() + 3.5, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25),
+        Rotation2d.fromDegrees(90.0));
+
     public class TrajectorySet {
         public class MirroredTrajectory {
             public MirroredTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> right) {
@@ -125,6 +128,7 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> rightScaleToFirstCube;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateRightCubeToRightScale;
         public final Trajectory<TimedState<Pose2dWithCurvature>> alternateRightScaleToSecondCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> secondCubeToRightScale;
 
         //Left Switch Auto
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontLeftSwitch;
@@ -158,6 +162,7 @@ public class TrajectoryGenerator {
             rightScaleToFirstCube = convertPath(PathManager.mRightScaleToFirstCube, 3.75);
             alternateRightCubeToRightScale = convertPath(PathManager.mAlternateRightCubeToRightScale, 4.75);
             alternateRightScaleToSecondCube = convertPath(PathManager.mAlternateRightScaleToSecondCube, 5.5);
+            secondCubeToRightScale = getSecondCubeToRightScale();
 
             frontLeftSwitch = convertPath(PathManager.mFrontLeftSwitch, 6.0);
             frontLeftSwitchToOuterCube = convertPath(PathManager.mFrontLeftSwitchToOuterCube, 5.75);
@@ -181,6 +186,14 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
             //return convertPath(PathManager.mStartToLeftScale, 6.25);
             return generateTrajectory(false, convertWaypoints(PathManager.mStartToLeftScale), Arrays.asList(), 8.0, 6.0, 2.0, kMaxVoltage, 7.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getSecondCubeToRightScale(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kSecondRightCubePose);
+            waypoints.add(Pose2d.fromTranslation(new Translation2d(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength - 0.25, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 1.25)));
+            
+            return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 6.0, 1);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getBackOffLeftScale(){
