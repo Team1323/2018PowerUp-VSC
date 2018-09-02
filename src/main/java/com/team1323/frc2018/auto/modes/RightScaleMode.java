@@ -17,6 +17,7 @@ import com.team1323.frc2018.auto.actions.WaitToIntakeCubeAction;
 import com.team1323.frc2018.auto.actions.WaitToPassYCoordinateAction;
 import com.team1323.frc2018.subsystems.Intake;
 import com.team1323.frc2018.subsystems.Intake.IntakeState;
+import com.team1323.frc2018.subsystems.RequestList;
 import com.team1323.frc2018.subsystems.Superstructure;
 import com.team1323.frc2018.subsystems.Swerve;
 import com.team254.lib.geometry.Pose2dWithCurvature;
@@ -49,13 +50,13 @@ public class RightScaleMode extends AutoModeBase{
 		s.request(intake.stateRequest(IntakeState.CLAMPING));
 		s.request(s.wrist.angleRequest(Constants.kWristPrimaryStowAngle));
 		runAction(new SetTrajectoryAction(trajectories.startToRightScale, -90.0, 0.75));
-		runAction(new WaitToPassYCoordinateAction(15.0));
+		runAction(new WaitToPassYCoordinateAction(17.0));//15.0
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
-		runAction(new WaitToPassYCoordinateAction(17.0));
+		//runAction(new WaitToPassYCoordinateAction(17.0));
 		Swerve.getInstance().setAbsolutePathHeading(-40.0);
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.rightScaleToFirstCube, -180.0, 1.0));
@@ -63,7 +64,8 @@ public class RightScaleMode extends AutoModeBase{
 		s.request(s.elevatorWristIntakeConfig(
 				Constants.kElevatorIntakingHeight, 
 				Constants.kWristIntakingAngle, 
-				IntakeState.INTAKING_WIDE));
+				IntakeState.OPEN),
+				new RequestList(s.intake.stateRequest(IntakeState.INTAKING_WIDE)));
 		runAction(new WaitForWallAction(2.5));
 		System.out.println("Right Switch X: " + Swerve.getInstance().getPose().getTranslation().x());
 		s.request(intake.stateRequest(IntakeState.INTAKING));
@@ -76,20 +78,21 @@ public class RightScaleMode extends AutoModeBase{
 			}
 		}
 		System.out.println("Second cube intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		runAction(new SetTrajectoryAction(trajectories.alternateRightCubeToRightScale, -55.0, 1.25));
+		runAction(new SetTrajectoryAction(trajectories.alternateRightCubeToRightScale, -40.0, 1.25));//-55.0
 		runAction(new WaitAction(0.25));
-		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 55.0));
+		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 75.0));//55.0
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
+		s.request(intake.ejectRequest(-0.4));
 		System.out.println("Second cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
-		runAction(new SetTrajectoryAction(trajectories.alternateRightScaleToSecondCube, -135.0, 0.5));
+		runAction(new SetTrajectoryAction(trajectories.alternateRightScaleToSecondCube, -130.0, 0.5));//-135.0
 		runAction(new WaitAction(0.75));
 		s.request(s.elevatorWristIntakeConfig(
 				Constants.kElevatorIntakingHeight, 
 				Constants.kWristIntakingAngle, 
-				IntakeState.INTAKING));
+				IntakeState.INTAKING),
+				new RequestList(s.intake.stateRequest(IntakeState.INTAKING)));
 		runAction(new WaitToIntakeCubeAction(3.5));
 		if(!intake.hasCube()){
 			s.request(s.elevatorWristIntakeConfig(
@@ -104,10 +107,10 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new WaitAction(0.25));
 		/*s.request(Wrist.getInstance().angleRequest(Constants.kWristPrimaryStowAngle));
 		runAction(new WaitToFinishPathAction());*/
-		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 55.0));
+		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 65.0));//55.0
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
 		System.out.println("Third cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 	}
 

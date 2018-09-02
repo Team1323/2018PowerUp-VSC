@@ -11,6 +11,10 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
+import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
+import com.team1323.frc2018.auto.modes.LeftScaleAssistMode;
+import com.team1323.frc2018.auto.modes.LeftScaleMode;
+import com.team1323.frc2018.auto.modes.RightFrontSwitchMode;
 import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
@@ -107,8 +111,8 @@ public class Robot extends IterativeRobot {
 		
 		generator.generateTrajectories();
 
-		//qTransmitter.addPaths(LeftScaleMode.getPaths());
-		qTransmitter.addPaths(RightScaleMode.getPaths());
+		qTransmitter.addPaths(LeftScaleMode.getPaths());
+		//qTransmitter.addPaths(RightScaleMode.getPaths());
 		//qTransmitter.addPaths(LeftScaleAssistMode.getPaths());
 		//qTransmitter.addPaths(LeftFrontSwitchMode.getPaths());
 		//qTransmitter.addPaths(RightFrontSwitchMode.getPaths());
@@ -142,7 +146,7 @@ public class Robot extends IterativeRobot {
 			disabledLooper.stop();
 			enabledLooper.start();
 			
-			superstructure.elevator.setCurrentLimit(20);
+			superstructure.elevator.setCurrentLimit(15);
 			superstructure.elevator.configForAutoSpeed();
 			
 			superstructure.intake.setHoldingOutput(Constants.kIntakeWeakHoldingOutput);

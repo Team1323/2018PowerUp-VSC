@@ -108,23 +108,23 @@ public class Elevator extends Subsystem{
 		manualSpeed = Constants.kElevatorTeleopManualSpeed;
 		
 		master.selectProfileSlot(0, 0);
-		master.config_kP(0, 4.0, 10);
-		master.config_kI(0, 0.0, 10);
-		master.config_kD(0, 160.0, 10);
+		master.config_kP(0, 1.5, 10);//4.0
+		master.config_kI(0, 0.0, 10);//0.0
+		master.config_kD(0, 90.0, 10);//160.0
 		master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 		
-		master.config_kP(1, 1.0, 10);//1.5
-		master.config_kI(1, 0.0, 10);
-		master.config_kD(1, 70.0, 10);
+		master.config_kP(1, 1.5, 10);//1.0
+		master.config_kI(1, 0.0, 10);//0.0
+		master.config_kD(1, 60.0, 10);//70.0
 		master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 		
-		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear*1.0), 10);//0.9
-		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear*3.0), 10);//5.0
+		//master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear*1.0), 10);//0.9
+		//master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear*3.0), 10);//5.0
 	}
 	
 	public void configForTeleopSpeed(){
 		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * (Constants.kIsUsingCompBot ? 1.0 : 0.9)), 10);//0.9
-		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* (Constants.kIsUsingCompBot ? 3.0 : 3.0)), 10);//5.0
+		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* (Constants.kIsUsingCompBot ? 5.0 : 3.0)), 10);//5.0
 	}
 	
 	public void configForAutoSpeed(){
@@ -335,7 +335,7 @@ public class Elevator extends Subsystem{
 		if(master.getControlMode() == ControlMode.MotionMagic){
 			if((Math.abs(targetHeight - getHeight()) <= Constants.kElevatorHeightTolerance)){
 				if(!onTarget){
-					//System.out.println("Elevator done in: " + (Timer.getFPGATimestamp() - startTime));
+					System.out.println("Elevator done in: " + (Timer.getFPGATimestamp() - startTime));
 					onTarget = true;
 				}
 				return true;
