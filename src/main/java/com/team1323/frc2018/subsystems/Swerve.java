@@ -54,7 +54,10 @@ public class Swerve extends Subsystem{
 	public void temporarilyDisableHeadingController(){
 		headingController.temporarilyDisable();
 	}
-	
+	public double getTargetHeading(){
+		return headingController.getTargetHeading();
+	}
+
 	Pose2d pose;
 	double distanceTraveled;
 	double currentVelocity = 0;
@@ -204,6 +207,20 @@ public class Swerve extends Subsystem{
 		}
 		
 		this.robotCentric = robotCentric;
+	}
+
+	//Possible new control method for rotation
+	public Rotation2d averagedDirection = Rotation2d.identity();
+	public void resetAveragedDirection(){ averagedDirection = pose.getRotation(); }
+	public void setAveragedDirection(double degrees){ averagedDirection = Rotation2d.fromDegrees(degrees); }
+	public final double rotationDirectionThreshold = Math.toRadians(5.0);
+	public final double rotationDivision = 1.0;
+	public synchronized void updateControllerDirection(Translation2d input){
+		if(Util.epsilonEquals(input.norm(), 1.0, 0.1)){
+			Rotation2d direction = input.direction();
+			double roundedDirection = Math.round(direction.getDegrees() / rotationDivision) * rotationDivision;
+			averagedDirection = Rotation2d.fromDegrees(roundedDirection);
+		}
 	}
 	
 	public synchronized void rotate(double goalHeading){
@@ -438,7 +455,7 @@ public class Swerve extends Subsystem{
 				rotate(headingController.getTargetHeading());
 			break;
 		case ROTATION:
-			kinematics.calculate(0.0, 0.0, rotationCorrection);
+			kinematics.calculate(0.0, 0.0, Util.deadBand(rotationCorrection, 0.1));
 			for(int i=0; i<modules.size(); i++){
 	    		if(Util.shouldReverse(kinematics.wheelAngles[i], modules.get(i).getModuleAngle().getDegrees())){
 	    			modules.get(i).setModuleAngle(kinematics.wheelAngles[i] + 180.0);
@@ -568,6 +585,7 @@ public class Swerve extends Subsystem{
 				translationalVector = new Translation2d();
 				lastActiveVector = rotationalVector;
 				rotationalInput = 0;
+				resetAveragedDirection();
 				headingController.temporarilyDisable();
 				stop();
 				lastUpdateTimestamp = timestamp;

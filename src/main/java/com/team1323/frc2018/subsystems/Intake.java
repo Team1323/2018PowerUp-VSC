@@ -51,20 +51,25 @@ public class Intake extends Subsystem{
 		leftIntake.enableVoltageCompensation(true);
 		rightIntake.enableVoltageCompensation(true);
 		
-		leftIntake.configContinuousCurrentLimit(30, 10);
-		leftIntake.configPeakCurrentLimit(25, 10);
-		leftIntake.configPeakCurrentDuration(10, 10);
-		leftIntake.enableCurrentLimit(true);
-		rightIntake.configContinuousCurrentLimit(30, 10);
-		rightIntake.configPeakCurrentLimit(25, 10);
-		rightIntake.configPeakCurrentDuration(10, 10);
-		rightIntake.enableCurrentLimit(true);
+		setCurrentLimit(30);
+
 		leftIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20, 10);
 		leftIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20, 10);
 		rightIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20, 10);
 		rightIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20, 10);
 	}
 	
+	public void setCurrentLimit(int amps){
+		leftIntake.configContinuousCurrentLimit(amps, 10);
+		leftIntake.configPeakCurrentLimit(amps, 10);
+		leftIntake.configPeakCurrentDuration(10, 10);
+		leftIntake.enableCurrentLimit(true);
+		rightIntake.configContinuousCurrentLimit(amps, 10);
+		rightIntake.configPeakCurrentLimit(amps, 10);
+		rightIntake.configPeakCurrentDuration(10, 10);
+		rightIntake.enableCurrentLimit(true);
+	}
+
 	private void setRampRate(double secondsToFull){
 		leftIntake.configOpenloopRamp(secondsToFull, 0);
 		rightIntake.configOpenloopRamp(secondsToFull, 0);

@@ -23,6 +23,7 @@ public class Pigeon {
     
 	private Pigeon(){
 		try{
+			//TODO plug the Pigeon into a different Talon on the comp bot
 			pigeon = Constants.kIsUsingCompBot ? new PigeonIMU(Elevator.getInstance().getPigeonTalon()) :
 				new PigeonIMU(new TalonSRX(Ports.PIGEON_TALON));
 		}catch(Exception e){

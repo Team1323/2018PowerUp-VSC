@@ -11,11 +11,7 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
-import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
-import com.team1323.frc2018.auto.modes.LeftScaleAssistMode;
 import com.team1323.frc2018.auto.modes.LeftScaleMode;
-import com.team1323.frc2018.auto.modes.RightFrontSwitchMode;
-import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -31,6 +27,8 @@ import com.team1323.frc2018.subsystems.Wrist;
 import com.team1323.io.Xbox;
 import com.team1323.lib.util.CrashTracker;
 import com.team1323.lib.util.Logger;
+import com.team1323.lib.util.Util;
+import com.team254.lib.geometry.Translation2d;
 import com.team254.lib.trajectory.TimedView;
 import com.team254.lib.trajectory.TrajectoryGenerator;
 import com.team254.lib.trajectory.TrajectoryIterator;
@@ -71,6 +69,8 @@ public class Robot extends IterativeRobot {
 	private RobotState robotState = RobotState.getInstance();
 	
 	private Xbox driver, coDriver;
+	private final boolean oneControllerMode = false;
+	private boolean flickRotation = false;
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -182,7 +182,7 @@ public class Robot extends IterativeRobot {
 			enabledLooper.start();
 			superstructure.enableCompressor(true);
 			swerve.setNominalDriveOutput(0.0);
-			superstructure.elevator.setCurrentLimit(30);
+			superstructure.elevator.setCurrentLimit(15);
 			superstructure.elevator.configForTeleopSpeed();
 			superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
 			SmartDashboard.putBoolean("Auto", false);
@@ -201,147 +201,8 @@ public class Robot extends IterativeRobot {
 			driver.update();
 			coDriver.update();
 			
-			if(coDriver.backButton.isBeingPressed()){
-				superstructure.request(intake.stateRequest(IntakeState.OFF));
-			}
-			
-			double swerveYInput = driver.getX(Hand.kLeft);
-			double swerveXInput = -driver.getY(Hand.kLeft);
-			double swerveRotationInput = driver.getX(Hand.kRight);
-			
-			swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightCenterClick.isBeingPressed(), driver.leftTrigger.isBeingPressed());
-			if(driver.yButton.isBeingPressed())
-				swerve.rotate(0);
-			else if(driver.bButton.isBeingPressed())
-				swerve.rotate(90);
-			else if(driver.aButton.isBeingPressed())
-				swerve.rotate(180);
-			else if(driver.xButton.isBeingPressed())
-				swerve.rotate(270);
-			else if(driver.leftCenterClick.isBeingPressed())
-				swerve.rotate(-135);
-			else if(driver.rightBumper.isBeingPressed())
-				swerve.rotate(25);
-			if(driver.backButton.wasPressed()){
-				swerve.temporarilyDisableHeadingController();
-				swerve.zeroSensors(Constants.kRobotStartingPose);
-			}else if(driver.backButton.longPressed()){
-				swerve.temporarilyDisableHeadingController();
-				swerve.zeroSensors(Constants.kRobotStartingPose);
-			}else if(driver.rightTrigger.wasPressed()){
-				/*swerve.setVectorField(
-						(new ConstantVectorField(new Translation2d(1,0)))
-						.add(new GuidingVectorField(new PolyCone(Arrays.asList(
-							Constants.kLeftSwitchCloseCorner,
-							Constants.kLeftSwitchFarCorner,
-							Constants.kRightSwitchFarCorner,
-							Constants.kRightSwitchCloseCorner
-						)), here -> 1.0)) // k = 0 to make all followey no approachey
-					);*/
-				//swerve.toggleEvade();
-				swerve.temporarilyDisableHeadingController();
-				swerve.zeroSensors(Constants.kRobotLeftStartingPose);
-				swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 0.75);
-			}
-						
-			if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
-				superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft)*0.5);
-			else
-				superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft));
-			
-			if(!superstructure.driveTrainFlipped()){
-				if(coDriver.aButton.wasPressed()){
-					superstructure.request(superstructure.elevatorWristConfig(Constants.kElevatorIntakingHeight, 
-							Constants.kWristIntakingAngle));
-					superstructure.replaceQueue(Arrays.asList(new RequestList(intake.waitForCubeRequest()),
-							new RequestList(intake.stateRequest(IntakeState.CLAMPING)),
-							new RequestList(wrist.angleRequest(Constants.kWristPrimaryStowAngle))));
-				}else if(coDriver.aButton.longPressed()){
-					if(intake.getState() == IntakeState.INTAKING)
-						superstructure.replaceQueue(superstructure.elevatorWristIntakeConfig(0.31, 13.0, IntakeState.CLAMPING));
-					else
-						superstructure.request(superstructure.elevatorWristIntakeConfig(0.31, 13.0, IntakeState.CLAMPING));
-				}else if(coDriver.xButton.wasPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorSwitchHeight, 
-							20.0, IntakeState.CLAMPING));
-				}else if(coDriver.xButton.longPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHumanLoadHeight, 
-							Constants.kWristIntakingAngle, IntakeState.OPEN));
-				}else if(coDriver.bButton.wasPressed()){
-					superstructure.request(superstructure.wristIntakeConfig(Constants.kWristPrimaryStowAngle, IntakeState.CLAMPING));
-				}else if(coDriver.bButton.longPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorIntakingHeight, 
-							Constants.kWristPrimaryStowAngle, IntakeState.OFF));
-				}else if(coDriver.yButton.wasPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kELevatorBalancedScaleHeight, 
-							20.0, IntakeState.CLAMPING));
-				}else if(coDriver.POV0.wasPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHighScaleHeight, 
-							60.0, IntakeState.CLAMPING));
-				}else if(coDriver.POV180.wasPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorLowScaleHeight, 
-							25.0, IntakeState.CLAMPING));
-				}else if(coDriver.POV90.wasPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorTippingCubeHeight,
-							Constants.kWristIntakingAngle, IntakeState.OFF));
-				}else if(coDriver.rightCenterClick.wasPressed()){
-					superstructure.request(superstructure.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 
-							Constants.kWristIntakingAngle),
-							new RequestList(intake.stateRequest(IntakeState.INTAKING)));
-				}else if(coDriver.leftBumper.wasPressed()){
-					superstructure.request(superstructure.elevatorWristIntakeConfig(
-							Constants.kElevatorIntakingHeight, 
-							Constants.kWristIntakingAngle, 
-							IntakeState.OFF),
-							new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
-				}
-			}else{
-				if(coDriver.POV0.isBeingPressed()){
-					superstructure.requestWinchOpenLoop(0.75);
-				}else if(coDriver.POV180.isBeingPressed()){
-					superstructure.requestWinchOpenLoop(-0.75);
-				}else{
-					superstructure.requestWinchOpenLoop(0.0);
-				}
-			}
-			
-			if(coDriver.rightBumper.isBeingPressed()){
-				superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.FORCED_INTAKE));
-			}else if(intake.getState() == IntakeState.FORCED_INTAKE){
-				superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OFF));
-			}else if(coDriver.leftTrigger.wasPressed() || driver.leftBumper.wasPressed()){
-				superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OPEN));
-			}else if(coDriver.rightTrigger.wasPressed() || driver.rightTrigger.wasPressed()){
-				superstructure.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
-			}else if(coDriver.rightTrigger.longPressed() || driver.rightTrigger.longPressed()){
-				superstructure.addForemostActiveRequest(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
-			}
-			
-			if(driver.POV0.wasPressed()){
-				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kELevatorHangingHeight, 
-						Constants.kWristPrimaryStowAngle, IntakeState.OPEN),
-						new RequestList(elevator.gearShiftRequest(false)));
-			}else if(driver.POV180.wasPressed() && !elevator.isHighGear()){
-				//superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
-			}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){
-				//flip is disabled for now, due to our adoption of forks for CC
-				//superstructure.flipDriveTrain();
-				elevator.toggleForks();
-			}
-			
-			if(intake.needsToNotifyDrivers()){
-				driver.rumble(1.0, 1.0);
-				coDriver.rumble(1.0, 1.0);
-			}
-			
-			if(coDriver.startButton.longPressed()){
-				elevator.setManualSpeed(0.25);
-				superstructure.elevator.enableLimits(false);
-			}else if(!superstructure.elevator.limitsEnabled() && coDriver.getY(Hand.kLeft) == 0){
-				superstructure.elevator.zeroSensors();
-				superstructure.elevator.enableLimits(true);
-				elevator.setManualSpeed(Constants.kElevatorTeleopManualSpeed);
-			}
+			if(oneControllerMode) oneControllerMode();
+			else twoControllerMode();
 			
 			allPeriodic();
 		}catch(Throwable t){
@@ -392,5 +253,254 @@ public class Robot extends IterativeRobot {
 	
 	@Override
 	public void testPeriodic() {
+	}
+
+	private void twoControllerMode(){
+		if(coDriver.backButton.isBeingPressed()){
+			superstructure.request(intake.stateRequest(IntakeState.OFF));
+		}
+		
+		double swerveYInput = driver.getX(Hand.kLeft);
+		double swerveXInput = -driver.getY(Hand.kLeft);
+		double swerveRotationInput = (flickRotation ? 0.0 : driver.getX(Hand.kRight));
+		
+		swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, false, driver.leftTrigger.isBeingPressed());
+
+		if(driver.rightCenterClick.wasPressed()){
+			if(flickRotation){
+				driver.rumble(3, 1);
+			}else{
+				driver.rumble(1, 1);
+			}
+			flickRotation = !flickRotation;
+		}
+
+		if(flickRotation){
+			swerve.updateControllerDirection(new Translation2d(-driver.getY(Hand.kRight), driver.getX(Hand.kRight)));
+			if(!Util.epsilonEquals(Util.placeInAppropriate0To360Scope(swerve.getTargetHeading(), swerve.averagedDirection.getDegrees()), swerve.getTargetHeading(), swerve.rotationDivision / 2.0)){
+				swerve.rotate(swerve.averagedDirection.getDegrees());
+			}
+		}
+
+		if(driver.yButton.isBeingPressed())
+			swerve.rotate(0);
+		else if(driver.bButton.isBeingPressed())
+			swerve.rotate(90);
+		else if(driver.aButton.isBeingPressed())
+			swerve.rotate(180);
+		else if(driver.xButton.isBeingPressed())
+			swerve.rotate(270);
+		else if(driver.leftCenterClick.isBeingPressed())
+			swerve.rotate(-135);
+		else if(driver.rightBumper.isBeingPressed())
+			swerve.rotate(25);
+		if(driver.backButton.wasPressed()){
+			swerve.temporarilyDisableHeadingController();
+			swerve.zeroSensors(Constants.kRobotStartingPose);
+			swerve.resetAveragedDirection();
+		}else if(driver.backButton.longPressed()){
+			swerve.temporarilyDisableHeadingController();
+			swerve.zeroSensors(Constants.kRobotStartingPose);
+			swerve.resetAveragedDirection();
+		}else if(driver.rightTrigger.wasPressed()){
+			swerve.temporarilyDisableHeadingController();
+			swerve.zeroSensors(Constants.kRobotLeftStartingPose);
+			swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 0.75);
+		}
+					
+		if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft)*0.5);
+		else
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft));
+		
+		if(!superstructure.driveTrainFlipped()){
+			if(coDriver.aButton.wasPressed()){
+				superstructure.request(superstructure.elevatorWristConfig(Constants.kElevatorIntakingHeight, 
+						Constants.kWristIntakingAngle));
+				superstructure.replaceQueue(Arrays.asList(new RequestList(intake.waitForCubeRequest()),
+						new RequestList(intake.stateRequest(IntakeState.CLAMPING)),
+						new RequestList(wrist.angleRequest(Constants.kWristPrimaryStowAngle))));
+			}else if(coDriver.aButton.longPressed()){
+				if(intake.getState() == IntakeState.INTAKING)
+					superstructure.replaceQueue(superstructure.elevatorWristIntakeConfig(0.31, 13.0, IntakeState.CLAMPING));
+				else
+					superstructure.request(superstructure.elevatorWristIntakeConfig(0.31, 13.0, IntakeState.CLAMPING));
+			}else if(coDriver.xButton.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorSwitchHeight, 
+						20.0, IntakeState.CLAMPING));
+			}else if(coDriver.xButton.longPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHumanLoadHeight, 
+						Constants.kWristIntakingAngle, IntakeState.OPEN));
+			}else if(coDriver.bButton.wasPressed()){
+				superstructure.request(superstructure.wristIntakeConfig(Constants.kWristPrimaryStowAngle, IntakeState.CLAMPING));
+			}else if(coDriver.bButton.longPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorIntakingHeight, 
+						Constants.kWristPrimaryStowAngle, IntakeState.OFF));
+			}else if(coDriver.yButton.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kELevatorBalancedScaleHeight, 
+						20.0, IntakeState.CLAMPING));
+			}else if(coDriver.POV0.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHighScaleHeight, 
+						60.0, IntakeState.CLAMPING));
+			}else if(coDriver.POV180.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorLowScaleHeight, 
+						25.0, IntakeState.CLAMPING));
+			}else if(coDriver.POV90.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorTippingCubeHeight,
+						Constants.kWristIntakingAngle, IntakeState.OFF));
+			}else if(coDriver.rightCenterClick.wasPressed()){
+				superstructure.request(superstructure.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 
+						Constants.kWristIntakingAngle),
+						new RequestList(intake.stateRequest(IntakeState.INTAKING)));
+			}else if(coDriver.leftBumper.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(
+						Constants.kElevatorIntakingHeight, 
+						Constants.kWristIntakingAngle, 
+						IntakeState.OFF),
+						new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
+			}
+		}else{
+			if(coDriver.POV0.isBeingPressed()){
+				superstructure.requestWinchOpenLoop(0.75);
+			}else if(coDriver.POV180.isBeingPressed()){
+				superstructure.requestWinchOpenLoop(-0.75);
+			}else{
+				superstructure.requestWinchOpenLoop(0.0);
+			}
+		}
+		
+		if(coDriver.rightBumper.isBeingPressed()){
+			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.FORCED_INTAKE));
+		}else if(intake.getState() == IntakeState.FORCED_INTAKE){
+			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OFF));
+		}else if(coDriver.leftTrigger.wasPressed() || driver.leftBumper.wasPressed()){
+			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OPEN));
+		}else if(coDriver.rightTrigger.wasPressed() || driver.rightTrigger.wasPressed()){
+			superstructure.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		}else if(coDriver.rightTrigger.longPressed() || driver.rightTrigger.longPressed()){
+			superstructure.addForemostActiveRequest(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
+		}
+		
+		if(driver.POV0.wasPressed()){
+			superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kELevatorHangingHeight, 
+					Constants.kWristPrimaryStowAngle, IntakeState.OPEN),
+					new RequestList(elevator.gearShiftRequest(false)));
+		}else if(driver.POV180.wasPressed() && !elevator.isHighGear()){
+			//superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
+		}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){
+			//flip is disabled for now, due to our adoption of forks for CC
+			//superstructure.flipDriveTrain();
+			elevator.toggleForks();
+		}
+		
+		if(intake.needsToNotifyDrivers()){
+			driver.rumble(1.0, 1.0);
+			coDriver.rumble(1.0, 1.0);
+		}
+		
+		if(coDriver.startButton.longPressed()){
+			elevator.setManualSpeed(0.25);
+			superstructure.elevator.enableLimits(false);
+		}else if(!superstructure.elevator.limitsEnabled() && coDriver.getY(Hand.kLeft) == 0){
+			superstructure.elevator.zeroSensors();
+			superstructure.elevator.enableLimits(true);
+			elevator.setManualSpeed(Constants.kElevatorTeleopManualSpeed);
+		}
+	}
+
+	private void oneControllerMode(){
+		if(driver.backButton.wasPressed() || coDriver.backButton.isBeingPressed()){
+			superstructure.request(intake.stateRequest(IntakeState.OFF));
+		}
+		
+		double swerveYInput = driver.getX(Hand.kLeft);
+		double swerveXInput = -driver.getY(Hand.kLeft);
+		double swerveRotationInput = (flickRotation ? 0.0 : driver.getX(Hand.kRight));
+		
+		swerve.sendInput(swerveXInput, swerveYInput, swerveRotationInput, driver.rightCenterClick.isBeingPressed(), driver.leftTrigger.isBeingPressed());
+
+		if(flickRotation){
+			swerve.updateControllerDirection(new Translation2d(-driver.getY(Hand.kRight), driver.getX(Hand.kRight)));
+			if(!Util.epsilonEquals(Util.placeInAppropriate0To360Scope(swerve.getTargetHeading(), swerve.averagedDirection.getDegrees()), swerve.getTargetHeading(), swerve.rotationDivision / 2.0)){
+				swerve.rotate(swerve.averagedDirection.getDegrees());
+			}
+		}
+
+		if(driver.backButton.longPressed()){
+			swerve.temporarilyDisableHeadingController();
+			swerve.zeroSensors(Constants.kRobotStartingPose);
+			swerve.resetAveragedDirection();
+		}
+		
+		if(!superstructure.driveTrainFlipped()){
+			if(driver.aButton.wasPressed() || coDriver.aButton.wasPressed()){
+				superstructure.request(superstructure.elevatorWristConfig(Constants.kElevatorIntakingHeight, 
+						Constants.kWristIntakingAngle));
+				superstructure.replaceQueue(Arrays.asList(new RequestList(intake.waitForCubeRequest()),
+						new RequestList(intake.stateRequest(IntakeState.CLAMPING)),
+						new RequestList(wrist.angleRequest(Constants.kWristPrimaryStowAngle))));
+			}else if(driver.xButton.wasPressed() || coDriver.xButton.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorSwitchHeight, 
+						20.0, IntakeState.CLAMPING));
+			}else if(driver.bButton.wasPressed() || coDriver.bButton.wasPressed()){
+				superstructure.request(superstructure.wristIntakeConfig(Constants.kWristPrimaryStowAngle, IntakeState.CLAMPING));
+			}else if(driver.bButton.longPressed() || coDriver.bButton.longPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorIntakingHeight, 
+						Constants.kWristPrimaryStowAngle, IntakeState.OFF));
+			}else if(driver.yButton.wasPressed() || coDriver.yButton.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kELevatorBalancedScaleHeight, 
+						20.0, IntakeState.CLAMPING));
+			}else if(driver.POV0.wasPressed() || coDriver.POV0.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHighScaleHeight, 
+						60.0, IntakeState.CLAMPING));
+			}else if(driver.POV180.wasPressed() || coDriver.POV180.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorLowScaleHeight, 
+						25.0, IntakeState.CLAMPING));
+			}else if(driver.POV90.wasPressed() || coDriver.POV90.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorTippingCubeHeight,
+						Constants.kWristIntakingAngle, IntakeState.OFF));
+			}else if(driver.rightCenterClick.wasPressed() || coDriver.rightCenterClick.wasPressed()){
+				superstructure.request(superstructure.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 
+						Constants.kWristIntakingAngle),
+						new RequestList(intake.stateRequest(IntakeState.INTAKING)));
+			}else if(driver.leftBumper.wasPressed() || coDriver.leftBumper.wasPressed()){
+				superstructure.request(superstructure.elevatorWristIntakeConfig(
+						Constants.kElevatorIntakingHeight, 
+						Constants.kWristIntakingAngle, 
+						IntakeState.OFF),
+						new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
+			}
+		}
+
+		if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft)*0.5);
+		else
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft));
+		
+		if(driver.rightBumper.isBeingPressed() || coDriver.rightBumper.isBeingPressed()){
+			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.FORCED_INTAKE));
+		}else if(intake.getState() == IntakeState.FORCED_INTAKE){
+			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OFF));
+		}else if(driver.leftTrigger.wasPressed() || coDriver.leftTrigger.wasPressed()){
+			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OPEN));
+		}else if(driver.rightTrigger.wasPressed() || coDriver.rightTrigger.wasPressed()){
+			superstructure.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		}else if(driver.rightTrigger.longPressed() || coDriver.rightTrigger.longPressed()){
+			superstructure.addForemostActiveRequest(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
+		}
+		
+		if(intake.needsToNotifyDrivers()){
+			driver.rumble(1.0, 1.0);
+			coDriver.rumble(1.0, 1.0);
+		}
+
+		if(coDriver.startButton.longPressed()){
+			elevator.setManualSpeed(0.25);
+			superstructure.elevator.enableLimits(false);
+		}else if(!superstructure.elevator.limitsEnabled() && coDriver.getY(Hand.kLeft) == 0){
+			superstructure.elevator.zeroSensors();
+			superstructure.elevator.enableLimits(true);
+			elevator.setManualSpeed(Constants.kElevatorTeleopManualSpeed);
+		}
 	}
 }
