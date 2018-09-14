@@ -175,7 +175,7 @@ public class Constants {
 	
 	//Intake Constants
 	public static final double kIntakeWeakEjectOutput = -0.4;
-	public static final double kIntakeEjectOutput = kIsUsingCompBot ? -0.8 : -0.9;
+	public static final double kIntakeEjectOutput = kIsUsingCompBot ? -0.6 : -0.9;
 	public static final double kIntakeStrongEjectOutput = -1.0;
 	public static final double kIntakingOutput = 1.0;
 	public static final double kIntakeWeakHoldingOutput = 1.25/12.0;

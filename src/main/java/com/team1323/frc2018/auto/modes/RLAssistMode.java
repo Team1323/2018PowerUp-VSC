@@ -27,22 +27,20 @@ import com.team254.lib.trajectory.timing.TimedState;
 
 import edu.wpi.first.wpilibj.Timer;
 
-public class RightFrontSwitchMode extends AutoModeBase{
+public class RLAssistMode extends AutoModeBase{
 	Superstructure s;
 	Intake intake;
-	boolean leak = false;
 
 	private static List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.frontRightSwitch,
 		trajectories.frontRightSwitchToOuterCube, trajectories.outerCubeToFrontRightSwitch, trajectories.frontRightSwitchToMiddleCube,
-		trajectories.middleCubeToFrontRightSwitch, trajectories.frontRightSwitchToBottomMiddle);
+		trajectories.alternateMiddleCubeToLeftScale);
 	public static List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
 		return paths;
 	}
 	
-	public RightFrontSwitchMode(boolean leak){
+	public RLAssistMode(){
 		s = Superstructure.getInstance();
 		intake = Intake.getInstance();
-		this.leak = leak;
 	}
 	
 	@Override
@@ -95,32 +93,14 @@ public class RightFrontSwitchMode extends AutoModeBase{
 			runAction(new DriveStraightAction(Rotation2d.fromDegrees(0).toTranslation().scale(0.3)));
 			runAction(new WaitToIntakeCubeAction(1.0));
 		}
-		System.out.println("Third Cube Intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		runAction(new SetTrajectoryAction(trajectories.middleCubeToFrontRightSwitch, 0.0, 1.0));
-		runAction(new WaitAction(0.25));
-		s.request(s.elevatorWristConfig(Constants.kElevatorSwitchHeight, 20.0));
-		runAction(new WaitToFinishPathAction());
-		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
-		System.out.println("Third Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
-		if(leak){
-			runAction(new WaitAction(0.75));
-			runAction(new SetTrajectoryAction(trajectories.frontRightSwitchToDropoff, 0.0, 1.0));
-			s.request(Wrist.getInstance().angleRequest(Constants.kWristPrimaryStowAngle));
-			runAction(new WaitForElevatorAction());
-			s.request(s.elevatorWristConfig(Constants.kElevatorIntakingHeight, Constants.kWristPrimaryStowAngle));
-			runAction(new WaitToFinishPathAction());
-		}else{
-			runAction(new WaitAction(0.75));
-			runAction(new SetTrajectoryAction(trajectories.frontRightSwitchToBottomMiddle, -30.0, 1.0));
-			runAction(new WaitAction(0.75));
-			s.request(s.elevatorWristIntakeConfig(
-					Constants.kElevatorIntakingHeight, 
-					Constants.kWristIntakingAngle, 
-					IntakeState.INTAKING));
-			runAction(new WaitToFinishPathAction(3.0));
-			runAction(new WaitToIntakeCubeAction(1.0));
-			System.out.println("Fourth Cube Intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		}
+        System.out.println("Third Cube Intaken at: " + (Timer.getFPGATimestamp() - startTime));
+        runAction(new SetTrajectoryAction(trajectories.alternateMiddleCubeToLeftScale, 90.0, 0.5));
+        runAction(new WaitAction(0.5));
+        s.request(s.wristIntakeConfig(Constants.kWristPrimaryStowAngle, IntakeState.CLAMPING));
+        runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchFarCorner.x() - 1.0));
+        s.request(s.elevatorWristConfig(4.5, 60.0));
+        runAction(new WaitToFinishPathAction());
+        s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+        System.out.println("Third cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 	}
-
 }

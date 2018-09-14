@@ -1,10 +1,13 @@
 package com.team1323.frc2018.auto;
 
+import com.team1323.frc2018.auto.modes.LLAssistMode;
+import com.team1323.frc2018.auto.modes.LRAssistMode;
 import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
-import com.team1323.frc2018.auto.modes.LeftScaleAssistMode;
 import com.team1323.frc2018.auto.modes.LeftScaleMode;
 import com.team1323.frc2018.auto.modes.LeftSwitchLeftScaleMode;
 import com.team1323.frc2018.auto.modes.LeftSwitchRightScaleMode;
+import com.team1323.frc2018.auto.modes.RLAssistMode;
+import com.team1323.frc2018.auto.modes.RRAssistMode;
 import com.team1323.frc2018.auto.modes.RightFrontSwitchMode;
 import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.auto.modes.RightSwitchLeftScaleMode;
@@ -19,7 +22,7 @@ public class SmartDashboardInteractions {
 	private static final String AUTO_OPTIONS = "auto_options";
     private static final String SELECTED_AUTO_MODE = "selected_auto_mode";
     
-    private static final AutoOption DEFAULT_MODE = AutoOption.SCALE_ONLY;
+    private static final AutoOption DEFAULT_MODE = AutoOption.ASSIST;
     
     private SendableChooser<AutoOption> modeChooser;
     
@@ -107,7 +110,13 @@ public class SmartDashboardInteractions {
 			case ASSIST:
 				switch(gameData){
 				case "LL":
-					return new LeftScaleAssistMode();
+					return new LLAssistMode();
+				case "LR":
+					return new LRAssistMode();
+				case "RR":
+					return new RRAssistMode();
+				case "RL":
+					return new RLAssistMode();
 				default:
 					System.out.println("ERROR: unexpected auto mode: " + option);
 					return new StandStillMode();

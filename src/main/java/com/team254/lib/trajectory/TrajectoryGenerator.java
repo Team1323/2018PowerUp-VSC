@@ -148,6 +148,12 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToDropoff;
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToBottomMiddle;
 
+        //Poof assist switch + scale
+        public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToLeftScale;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToRightScale;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> alternateMiddleCubeToLeftScale;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> alternateMiddleCubeToRightScale;
+
         //Poof assist scale auto
         public final Trajectory<TimedState<Pose2dWithCurvature>> backOffLeftScale;
 
@@ -180,6 +186,11 @@ public class TrajectoryGenerator {
             frontRightSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
             frontRightSwitchToBottomMiddle = convertPath(PathManager.mFrontRightSwitchToBottomMiddle, 4.25);
 
+            middleCubeToLeftScale = getMiddleCubeToLeftScale();
+            middleCubeToRightScale = getMiddleCubeToRightScale();
+            alternateMiddleCubeToLeftScale = getAlternateMiddleCubeToLeftScale();
+            alternateMiddleCubeToRightScale = getAlternateMiddleCubeToRightScale();
+
             backOffLeftScale = getBackOffLeftScale();
         }
 
@@ -194,6 +205,42 @@ public class TrajectoryGenerator {
             waypoints.add(Pose2d.fromTranslation(new Translation2d(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength - 0.25, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 1.35)));
             
             return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 6.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getMiddleCubeToRightScale(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(new Translation2d(Constants.kRightSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kRightSwitchCloseCorner.y() - Constants.kRobotHalfWidth - 4.6), Rotation2d.fromDegrees(90.0)));
+            waypoints.add(Pose2d.fromTranslation(Constants.kRightSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, Constants.kRobotHalfLength + 1.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kRightScaleCorner.translateBy(new Translation2d(1.0, 3.5))));
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getAlternateMiddleCubeToRightScale(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.2), Rotation2d.fromDegrees(90.0)));
+            waypoints.add(Pose2d.fromTranslation(Constants.kRightSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, Constants.kRobotHalfLength + 1.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kRightScaleCorner.translateBy(new Translation2d(1.0, 5.5))));
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getMiddleCubeToLeftScale(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.2), Rotation2d.fromDegrees(-90.0)));
+            waypoints.add(Pose2d.fromTranslation(Constants.kLeftSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, -Constants.kRobotHalfLength - 1.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kLeftScaleCorner.translateBy(new Translation2d(1.0, -3.5))));
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getAlternateMiddleCubeToLeftScale(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(new Translation2d(Constants.kRightSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kRightSwitchCloseCorner.y() - Constants.kRobotHalfWidth - 4.6), Rotation2d.fromDegrees(-90.0)));
+            waypoints.add(Pose2d.fromTranslation(Constants.kLeftSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, -Constants.kRobotHalfLength - 1.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kLeftScaleCorner.translateBy(new Translation2d(1.0, -5.5))));
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getBackOffLeftScale(){

@@ -11,7 +11,7 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
-import com.team1323.frc2018.auto.modes.LeftScaleMode;
+import com.team1323.frc2018.auto.modes.LLAssistMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -111,11 +111,12 @@ public class Robot extends IterativeRobot {
 		
 		generator.generateTrajectories();
 
-		qTransmitter.addPaths(LeftScaleMode.getPaths());
+		//qTransmitter.addPaths(LeftScaleMode.getPaths());
 		//qTransmitter.addPaths(RightScaleMode.getPaths());
 		//qTransmitter.addPaths(LeftScaleAssistMode.getPaths());
 		//qTransmitter.addPaths(LeftFrontSwitchMode.getPaths());
 		//qTransmitter.addPaths(RightFrontSwitchMode.getPaths());
+		qTransmitter.addPaths(LLAssistMode.getPaths());
 	}
 	
 	public void allPeriodic(){

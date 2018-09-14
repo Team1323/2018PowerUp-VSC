@@ -52,7 +52,7 @@ public class LeftFrontSwitchMode extends AutoModeBase{
 	@Override
 	protected void routine() throws AutoModeEndedException {
 		double startTime = Timer.getFPGATimestamp();
-		runAction(new ResetPoseAction(Constants.kRobotStartingPose.transformBy(Pose2d.fromTranslation(new Translation2d(-0.25, 0.0)))));
+		runAction(new ResetPoseAction(Constants.kRobotStartingPose.transformBy(Pose2d.fromTranslation(new Translation2d(/*-0.25*/0.0, 0.0)))));
 		s.request(intake.stateRequest(IntakeState.CLAMPING));
 		runAction(new SetTrajectoryAction(trajectories.frontLeftSwitch, 0.0, 1.0));
 		runAction(new WaitAction(0.5));
