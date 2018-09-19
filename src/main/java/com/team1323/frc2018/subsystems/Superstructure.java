@@ -24,7 +24,7 @@ public class Superstructure extends Subsystem{
 	public Wrist wrist;
 	public Elevator elevator;
 	
-	private TalonSRX winch;
+	//private TalonSRX winch;
 	private boolean winchSetpointSet = false;
 	
 	private Compressor compressor;
@@ -36,7 +36,7 @@ public class Superstructure extends Subsystem{
 		wrist = Wrist.getInstance();
 		elevator = Elevator.getInstance();
 		
-		winch = new TalonSRX(Ports.WINCH);
+		/*winch = new TalonSRX(Ports.WINCH);
 		winch.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
 		winch.setNeutralMode(NeutralMode.Brake);
 		winch.selectProfileSlot(0, 0);
@@ -44,7 +44,7 @@ public class Superstructure extends Subsystem{
 		winch.config_kI(0, 0.0, 10);
 		winch.config_kD(0, 0.0, 10);
 		winch.config_kF(0, 0.0, 10);
-		winch.configAllowableClosedloopError(0, 0, 10);
+		winch.configAllowableClosedloopError(0, 0, 10);*/
 		
 		compressor = new Compressor(20);
 		
@@ -234,7 +234,7 @@ public class Superstructure extends Subsystem{
 	}
 	
 	public synchronized void requestWinchOpenLoop(double input){
-		if(driveTrainFlipped() && input != 0){
+		/*if(driveTrainFlipped() && input != 0){
 			winch.set(ControlMode.PercentOutput, input);
 			winchSetpointSet = false;
 		}else if(driveTrainFlipped() && !winchSetpointSet){
@@ -243,7 +243,7 @@ public class Superstructure extends Subsystem{
 		}else if(!driveTrainFlipped()){
 			winch.set(ControlMode.PercentOutput, 0.0);
 			winchSetpointSet = false;
-		}
+		}*/
 	}
 	
 	/**

@@ -125,6 +125,30 @@ public class Robot extends IterativeRobot {
 		enabledLooper.outputToSmartDashboard();
 		
 	}
+
+	public void autoConfig(){
+		swerve.zeroSensors();
+		swerve.setNominalDriveOutput(1.5);
+		swerve.requireModuleConfiguration();
+		transmitter.transmitCachedPaths();
+
+		superstructure.elevator.setCurrentLimit(15);
+		superstructure.elevator.configForAutoSpeed();
+		
+		superstructure.intake.setHoldingOutput(Constants.kIntakeWeakHoldingOutput);
+		superstructure.intake.setCurrentLimit(30);
+		
+		superstructure.enableCompressor(false);
+	}
+
+	public void teleopConfig(){
+		superstructure.enableCompressor(true);
+		swerve.setNominalDriveOutput(0.0);
+		superstructure.elevator.setCurrentLimit(15);
+		superstructure.elevator.configForTeleopSpeed();
+		superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
+		superstructure.intake.enableCurrentLimit(false);
+	}
 	
 	public void initCamera(){
     	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
@@ -138,21 +162,11 @@ public class Robot extends IterativeRobot {
 		try{
 			if(autoModeExecuter != null)
 				autoModeExecuter.stop();
-			
-			swerve.zeroSensors();
-			swerve.setNominalDriveOutput(1.5);
-			swerve.requireModuleConfiguration();
-			transmitter.transmitCachedPaths();
+
+			autoConfig();
 			
 			disabledLooper.stop();
 			enabledLooper.start();
-			
-			superstructure.elevator.setCurrentLimit(15);
-			superstructure.elevator.configForAutoSpeed();
-			
-			superstructure.intake.setHoldingOutput(Constants.kIntakeWeakHoldingOutput);
-			
-			superstructure.enableCompressor(false);
 			
 			SmartDashboard.putBoolean("Auto", true);
 			
@@ -181,11 +195,7 @@ public class Robot extends IterativeRobot {
 		try{
 			disabledLooper.stop();
 			enabledLooper.start();
-			superstructure.enableCompressor(true);
-			swerve.setNominalDriveOutput(0.0);
-			superstructure.elevator.setCurrentLimit(15);
-			superstructure.elevator.configForTeleopSpeed();
-			superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
+			teleopConfig();
 			SmartDashboard.putBoolean("Auto", false);
 		}catch(Throwable t){
 			CrashTracker.logThrowableCrash(t);

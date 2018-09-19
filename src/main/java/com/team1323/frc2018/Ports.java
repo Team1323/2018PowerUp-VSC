@@ -14,8 +14,9 @@ public class Ports {
     public static final int ELEVATOR_1 = 1;
     public static final int ELEVATOR_2 = 2;
     public static final int ELEVATOR_3 = 14;
+    public static final int ELEVATOR_4 = 13;
     
-    public static final int WINCH = 13;
+    //public static final int WINCH = 13;
     
     public static final int INTAKE_LEFT = 10;
     public static final int INTAKE_RIGHT = 9;

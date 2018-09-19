@@ -23,7 +23,7 @@ public class Elevator extends Subsystem{
 		return instance;
 	}
 	
-	LazyTalonSRX master, motor2, motor3;
+	LazyTalonSRX master, motor2, motor3, motor4;
 	Solenoid shifter, latch, forks;
 	private double targetHeight = 0.0;
 	private boolean isHighGear = true;
@@ -64,9 +64,11 @@ public class Elevator extends Subsystem{
 		master = new LazyTalonSRX(Ports.ELEVATOR_1);
 		motor2 = new LazyTalonSRX(Ports.ELEVATOR_2);
 		motor3 = new LazyTalonSRX(Ports.ELEVATOR_3);
+		motor4 = new LazyTalonSRX(Ports.ELEVATOR_4);
 
 		motor2.set(ControlMode.Follower, Ports.ELEVATOR_1);
 		motor3.set(ControlMode.Follower, Ports.ELEVATOR_1);
+		motor4.set(ControlMode.Follower, Ports.ELEVATOR_1);
 		
 		shifter = new Solenoid(20, Ports.ELEVATOR_SHIFTER);
 		latch = new Solenoid(20, Ports.ELEVATOR_RELEASE_PISTON);
@@ -78,6 +80,7 @@ public class Elevator extends Subsystem{
 		master.setInverted(true);
 		motor2.setInverted(true);
 		motor3.setInverted(true);
+		motor4.setInverted(true);
 		
 		master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		master.setSensorPhase(true);
@@ -94,6 +97,7 @@ public class Elevator extends Subsystem{
 		master.setNeutralMode(NeutralMode.Brake);
 		motor2.setNeutralMode(NeutralMode.Brake);
 		motor3.setNeutralMode(NeutralMode.Brake);
+		motor4.setNeutralMode(NeutralMode.Brake);
 		configForLifting();
 	}
 	
@@ -114,17 +118,32 @@ public class Elevator extends Subsystem{
 			master.config_kD(0, 90.0, 10);
 			master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 			
-			master.config_kP(1, 0.5, 10);
-			master.config_kI(1, 0.0, 10);
-			master.config_kD(1, 90.0, 10);
-			master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+			if(Constants.kExtraNyooms){
+				master.config_kP(1, 1.5, 10);
+				master.config_kI(1, 0.0, 10);
+				master.config_kD(1, 90.0, 10);
+				master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+			}else{
+				master.config_kP(1, 0.5, 10);
+				master.config_kI(1, 0.0, 10);
+				master.config_kD(1, 90.0, 10);
+				master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+			}
 			
 			/*If you decide to go back to full speed on the comp bot, just change the downward PID to match
 			the upward PID (as a baseline). Right now it's tuned to be slower, until we can identify
 			the source of overshoot and encoder reset.*/
-			master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * (Constants.kIsUsingCompBot ? 0.7 : 0.9)), 10);//0.9
-			master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* (Constants.kIsUsingCompBot ? 5.0 : 3.0)), 10);//5.0
+			if(Constants.kExtraNyooms){
+				master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 1.0), 10);
+				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 5.0), 10);
+			}else{
+				master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 0.7), 10);
+				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 5.0), 10);
+			}
 		}else{
+			//The practice bot still has the old gearing, and therefore
+			//requires different PID values.
+
 			master.selectProfileSlot(0, 0);
 			master.config_kP(0, 4.0, 10);
 			master.config_kI(0, 0.0, 10);
@@ -136,8 +155,8 @@ public class Elevator extends Subsystem{
 			master.config_kD(1, 70.0, 10);
 			master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 			
-			master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * (Constants.kIsUsingCompBot ? 1.0 : 0.9)), 10);//0.9
-			master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* (Constants.kIsUsingCompBot ? 5.0 : 3.0)), 10);//5.0
+			master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 0.9), 10);
+			master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* 3.0), 10);
 		}
 	}
 	
@@ -146,8 +165,22 @@ public class Elevator extends Subsystem{
 	}
 	
 	public void configForAutoSpeed(){
-		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear*1.0), 10);//0.9
-		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear*3.0), 10);//3.0
+		/*kExtraNyooms might be false, so we have to make sure to set the PID values
+		for the faster elevator speed, even if its redundant.*/
+		if(Constants.kIsUsingCompBot){
+			master.config_kP(0, 1.5, 10);
+			master.config_kI(0, 0.0, 10);
+			master.config_kD(0, 90.0, 10);
+			master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+
+			master.config_kP(1, 1.5, 10);
+			master.config_kI(1, 0.0, 10);
+			master.config_kD(1, 90.0, 10);
+			master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+		}
+
+		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear*1.0), 10);
+		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear*3.0), 10);
 	}
 	
 	public void configForHanging(){
@@ -473,6 +506,7 @@ public class Elevator extends Subsystem{
 		
 		motor2.set(ControlMode.PercentOutput, 0.0);
 		motor3.set(ControlMode.PercentOutput, 0.0);
+		motor4.set(ControlMode.PercentOutput, 0.0);
 		
 		double startingEncPosition = master.getSelectedSensorPosition(0);
 		master.set(ControlMode.PercentOutput, testOutput);
@@ -529,6 +563,25 @@ public class Elevator extends Subsystem{
 			passed = false;
 		}else{
 			System.out.println("Elevator motor 3 current good: " + current);
+		}
+
+		startingEncPosition = master.getSelectedSensorPosition(0);
+		motor4.set(ControlMode.PercentOutput, -testOutput);
+		Timer.delay(timeInterval);
+		current = motor4.getOutputCurrent();
+		motor4.set(ControlMode.Follower, Ports.ELEVATOR_1);
+		if(Math.signum(master.getSelectedSensorPosition(0) - startingEncPosition) != -1.0){
+			System.out.println("Elevator motor 4 needs to be reversed");
+			passed = false;
+		}
+		if(current < currentMinimum){
+			System.out.println("Elevator motor 4 current too low: " + current);
+			passed = false;
+		}else if(current > currentMaximum){
+			System.out.println("Elevator motor 4 current too high: " + current);
+			passed = false;
+		}else{
+			System.out.println("Elevator motor 4 current good: " + current);
 		}
 		
 		master.configForwardSoftLimitEnable(true, 10);

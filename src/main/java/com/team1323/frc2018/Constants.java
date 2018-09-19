@@ -16,6 +16,7 @@ public class Constants {
 	
 	public static final boolean kIsUsingCompBot = true;
 	public static final boolean kIsUsingTractionWheels = true;
+	public static final boolean kExtraNyooms = true;
 	
 	//Physical Robot Dimensions
 	public static final double kRobotWidth = 39.0 / 12.0;

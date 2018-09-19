@@ -50,8 +50,6 @@ public class Intake extends Subsystem{
 		rightIntake.configVoltageCompSaturation(12.0, 10);
 		leftIntake.enableVoltageCompensation(true);
 		rightIntake.enableVoltageCompensation(true);
-		
-		setCurrentLimit(30);
 
 		leftIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 20, 10);
 		leftIntake.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20, 10);
@@ -68,6 +66,11 @@ public class Intake extends Subsystem{
 		rightIntake.configPeakCurrentLimit(amps, 10);
 		rightIntake.configPeakCurrentDuration(10, 10);
 		rightIntake.enableCurrentLimit(true);
+	}
+
+	public void enableCurrentLimit(boolean enable){
+		leftIntake.enableCurrentLimit(enable);
+		rightIntake.enableCurrentLimit(enable);
 	}
 
 	private void setRampRate(double secondsToFull){
