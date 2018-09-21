@@ -158,7 +158,7 @@ public class Constants {
 	/**
 	 * Pulse width position of the wrist encoder when the wrist is upright (at 90 degrees, parallel to the elevator).
 	 */
-	public static final int kWristStartingEncoderPosition = kIsUsingCompBot ? 533 : 559;
+	public static final int kWristStartingEncoderPosition = kIsUsingCompBot ? 3249 : 559;
 	/**
 	 * The number of rotations the wrist encoder undergoes for every rotation of the wrist.
 	 */

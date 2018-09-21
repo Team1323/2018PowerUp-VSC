@@ -22,16 +22,16 @@ public class SmartDashboardInteractions {
 	private static final String AUTO_OPTIONS = "auto_options";
     private static final String SELECTED_AUTO_MODE = "selected_auto_mode";
     
-    private static final AutoOption DEFAULT_MODE = AutoOption.SWITCH_AND_SCALE;
+    private static final AutoOption DEFAULT_MODE = AutoOption.SWITCH_ONLY;
     
     private SendableChooser<AutoOption> modeChooser;
     
     public void initWithDefaults(){
     	modeChooser = new SendableChooser<AutoOption>();
     	modeChooser.addDefault(DEFAULT_MODE.name, DEFAULT_MODE);
-    	modeChooser.addObject("Switch Only", AutoOption.SWITCH_ONLY);
+    	//modeChooser.addObject("Switch Only", AutoOption.SWITCH_ONLY);
 		modeChooser.addObject("Scale Only", AutoOption.SCALE_ONLY);
-		modeChooser.addObject("Assist", AutoOption.ASSIST);
+		modeChooser.addObject("2 Switch + 1 Scale", AutoOption.ASSIST);
     	
     	SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
@@ -49,7 +49,7 @@ public class SmartDashboardInteractions {
     }
     
     enum AutoOption{
-    	SWITCH_AND_SCALE("Switch and Scale"),
+    	SWITCH_AND_SCALE("Switch and Scale (Deprecated)"),
     	SWITCH_ONLY("Switch Only"),
 		SCALE_ONLY("Scale Only"),
 		ASSIST("Assist");

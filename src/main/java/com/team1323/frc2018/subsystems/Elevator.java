@@ -121,7 +121,7 @@ public class Elevator extends Subsystem{
 			if(Constants.kExtraNyooms){
 				master.config_kP(1, 1.5, 10);
 				master.config_kI(1, 0.0, 10);
-				master.config_kD(1, 90.0, 10);
+				master.config_kD(1, 45.0, 10);//90.0
 				master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 			}else{
 				master.config_kP(1, 0.5, 10);
@@ -135,7 +135,7 @@ public class Elevator extends Subsystem{
 			the source of overshoot and encoder reset.*/
 			if(Constants.kExtraNyooms){
 				master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 1.0), 10);
-				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 5.0), 10);
+				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 1.5), 10);
 			}else{
 				master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 0.7), 10);
 				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 5.0), 10);

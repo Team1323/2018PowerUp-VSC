@@ -166,7 +166,7 @@ public class Swerve extends Subsystem{
 		
 		/* Scale x and y by applying a power to the magnitude of the vector they create, in order
 		 to make the controls less sensitive at the lower end. */
-		final double power = 1.5;
+		final double power = (lowPower) ? 1.75 : 1.5;
 		Rotation2d direction = translationalInput.direction();
 		double scaledMagnitude = Math.pow(inputMagnitude, power);
 		translationalInput = new Translation2d(direction.cos() * scaledMagnitude,
@@ -183,7 +183,7 @@ public class Swerve extends Subsystem{
 		isInLowPower = lowPower;
 		if(lowPower){
 			translationalVector = translationalVector.scale(0.6);
-			rotate *= 0.4;
+			rotate *= 0.3;
 		}else{
 			rotate *= 0.8;
 		}

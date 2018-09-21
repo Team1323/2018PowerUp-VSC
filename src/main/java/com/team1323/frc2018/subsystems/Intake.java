@@ -221,10 +221,10 @@ public class Intake extends Subsystem{
 					setRampRate(0.0);
 					hasCube = false;
 				}
-				if(timestamp - stateEnteredTimestamp > 2.0){
+				/*if(timestamp - stateEnteredTimestamp > 2.0){
 					stop();
 					setRampRate(Constants.kIntakeRampRate);
-				}
+				}*/
 				break;
 			default:
 				break;
