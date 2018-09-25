@@ -76,6 +76,12 @@ public class Elevator extends Subsystem{
 		
 		master.configVoltageCompSaturation(12.0, 10);
 		master.enableVoltageCompensation(true);
+		motor2.configVoltageCompSaturation(12.0, 10);
+		motor2.enableVoltageCompensation(true);
+		motor3.configVoltageCompSaturation(12.0, 10);
+		motor3.enableVoltageCompensation(true);
+		motor4.configVoltageCompSaturation(12.0, 10);
+		motor4.enableVoltageCompensation(true);
 		
 		master.setInverted(true);
 		motor2.setInverted(true);

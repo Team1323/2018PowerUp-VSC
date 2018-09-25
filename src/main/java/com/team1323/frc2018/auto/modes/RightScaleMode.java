@@ -31,10 +31,12 @@ public class RightScaleMode extends AutoModeBase{
 	Superstructure s;
 	Intake intake;
 	
-	private static List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.startToRightScale,
+	private List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.startToRightScale,
 		trajectories.rightScaleToFirstCube, trajectories.alternateRightCubeToRightScale, 
 		trajectories.alternateRightScaleToSecondCube, trajectories.secondCubeToRightScale);
-	public static List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
+
+	@Override
+	public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
 		return paths;
 	}
 

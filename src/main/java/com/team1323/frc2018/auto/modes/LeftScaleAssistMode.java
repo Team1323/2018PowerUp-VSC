@@ -31,8 +31,10 @@ public class LeftScaleAssistMode extends AutoModeBase{
 	Superstructure s;
 	Intake intake;
 	
-	private static List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.startToLeftScale, trajectories.backOffLeftScale);
-	public static List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
+	private List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.startToLeftScale, trajectories.backOffLeftScale);
+
+	@Override
+	public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
 		return paths;
 	}
 

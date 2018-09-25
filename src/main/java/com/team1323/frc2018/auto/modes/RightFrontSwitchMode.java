@@ -32,10 +32,12 @@ public class RightFrontSwitchMode extends AutoModeBase{
 	Intake intake;
 	boolean leak = false;
 
-	private static List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.frontRightSwitch,
+	private List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.frontRightSwitch,
 		trajectories.frontRightSwitchToOuterCube, trajectories.outerCubeToFrontRightSwitch, trajectories.frontRightSwitchToMiddleCube,
 		trajectories.middleCubeToFrontRightSwitch, trajectories.frontRightSwitchToBottomMiddle);
-	public static List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
+
+	@Override
+	public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
 		return paths;
 	}
 	

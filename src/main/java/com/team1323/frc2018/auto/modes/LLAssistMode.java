@@ -35,10 +35,12 @@ public class LLAssistMode extends AutoModeBase{
 	Superstructure s;
 	Intake intake;
 
-	private static List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.frontLeftSwitch,
+	private List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.frontLeftSwitch,
 		trajectories.frontLeftSwitchToOuterCube, trajectories.outerCubeToFrontLeftSwitch, trajectories.frontLeftSwitchToMiddleCube,
 		trajectories.middleCubeToLeftScale);
-	public static List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
+
+	@Override
+	public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
 		return paths;
 	}
 

@@ -23,7 +23,7 @@ import com.team254.lib.util.Util;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveMotionPlanner implements CSVWritable {
-    private static final double kMaxDx = 2.0000000001;//2.0
+    private static final double kMaxDx = 2.0;//2.0
     private static final double kMaxDy = 0.25;
     private static final double kMaxDTheta = Math.toRadians(5.0);
     
@@ -36,6 +36,8 @@ public class DriveMotionPlanner implements CSVWritable {
     private double targetHeading = 0.0;
     private double currentHeading = 0.0;
     private double headingDifferential = 0.0;
+
+    private Translation2d followingCenter = Translation2d.identity();
 
     public enum FollowerType {
         PURE_PURSUIT
@@ -168,6 +170,13 @@ public class DriveMotionPlanner implements CSVWritable {
     	return currentHeading;
     }
 
+    /**
+     * @param followingCenter the followingCenter to set (relative to the robot's center)
+     */
+    public void setFollowingCenter(Translation2d followingCenter) {
+        this.followingCenter = followingCenter;
+    }
+
     @Override
     public String toCSV() {
         DecimalFormat fmt = new DecimalFormat("#0.000");
@@ -209,8 +218,6 @@ public class DriveMotionPlanner implements CSVWritable {
         
         final Translation2d steeringVector = Translation2d.fromPolar(steeringDirection, normalizedSpeed);
         
-        //System.out.println(steeringVector.toString());
-        
         return steeringVector;
     }
 
@@ -223,6 +230,8 @@ public class DriveMotionPlanner implements CSVWritable {
 
         mDt = timestamp - mLastTime;
         mLastTime = timestamp;
+
+        current_state = current_state.transformBy(Pose2d.fromTranslation(followingCenter));
         
         double searchStepSize = 1.0;
         double previewQuantity = 0.0;

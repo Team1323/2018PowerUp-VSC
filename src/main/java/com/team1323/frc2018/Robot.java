@@ -111,19 +111,13 @@ public class Robot extends IterativeRobot {
 		
 		generator.generateTrajectories();
 
-		//qTransmitter.addPaths(LeftScaleMode.getPaths());
-		//qTransmitter.addPaths(RightScaleMode.getPaths());
-		//qTransmitter.addPaths(LeftScaleAssistMode.getPaths());
-		//qTransmitter.addPaths(LeftFrontSwitchMode.getPaths());
-		//qTransmitter.addPaths(RightFrontSwitchMode.getPaths());
-		qTransmitter.addPaths(LLAssistMode.getPaths());
+		qTransmitter.addPaths(smartDashboardInteractions.getSelectedAutoMode(DriverStation.getInstance().getGameSpecificMessage().substring(0, 2)).getPaths());
 	}
 	
 	public void allPeriodic(){
 		subsystems.outputToSmartDashboard();
 		robotState.outputToSmartDashboard();
 		enabledLooper.outputToSmartDashboard();
-		
 	}
 
 	public void autoConfig(){
@@ -147,7 +141,7 @@ public class Robot extends IterativeRobot {
 		superstructure.elevator.setCurrentLimit(15);
 		superstructure.elevator.configForTeleopSpeed();
 		superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
-		superstructure.intake.enableCurrentLimit(false);
+		superstructure.intake.setCurrentLimit(30);
 	}
 	
 	public void initCamera(){

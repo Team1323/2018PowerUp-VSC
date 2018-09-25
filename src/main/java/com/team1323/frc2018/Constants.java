@@ -123,7 +123,7 @@ public class Constants {
 	public static final int kElevatorEncoderStartingPosition = 0;
 	public static final double kElevatorTicksPerFoot = 11983.0 / 2.5989583; //determined empirically
 	public static final double kElevatorHeightTolerance = 0.1; //feet
-	public static final double kElevatorIntakingHeight = 0.125; //feet
+	public static final double kElevatorIntakingHeight = 0.2; //feet
 	public static final double kElevatorSecondCubeHeight = 0.97;
 	public static final double kElevatorHumanLoadHeight = 1.836;
 	public static final double kElevatorSwitchHeight = 2.0; //feet
@@ -168,7 +168,7 @@ public class Constants {
 	public static final double kWristMaxControlAngle = 92.0; //degrees
 	public static final double kWristMinPhysicalAngle = -20.0;
 	public static final double kWristMaxPhysicalAngle = 110.0;//95.192
-	public static final double kWristIntakingAngle = kIsUsingCompBot ? 5.5 : 9.0;//p 5.7 c 1.78
+	public static final double kWristIntakingAngle = kIsUsingCompBot ? 6.5 : 9.0;
 	public static final double kWristPrimaryStowAngle = 85.0;
 	public static final double kWristSecondaryStowAngle = 60.0;
 	public static final double kWristMaxStowHeight = 3.5; //height of the elevator

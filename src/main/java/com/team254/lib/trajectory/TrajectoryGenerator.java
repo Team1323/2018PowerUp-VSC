@@ -159,7 +159,7 @@ public class TrajectoryGenerator {
 
         private TrajectorySet() {
             startToLeftScale = getStartToLeftScale();
-            alternateLeftmostCube = convertPath(PathManager.mAlternateLeftmostCube, 3.8);
+            alternateLeftmostCube = /*getAlternateLeftmostCube();*/convertPath(PathManager.mAlternateLeftmostCube, 3.8);
             derpLeftCubeToLeftScale = convertPath(PathManager.mDerpLeftCubeToLeftScale, 3.5);
             alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube, 4.7);
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
@@ -197,6 +197,17 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getStartToLeftScale() {
             //return convertPath(PathManager.mStartToLeftScale, 6.25);
             return generateTrajectory(false, convertWaypoints(PathManager.mStartToLeftScale), Arrays.asList(), 8.0, 6.0, 2.0, kMaxVoltage, 7.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getAlternateLeftmostCube(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            Pose2d firstTranslation = new Pose2d(new Translation2d(22.75, Constants.kLeftSwitchCloseCorner.y() - Constants.kRobotHalfLength - 1.0), Rotation2d.fromDegrees(65.0)).transformBy(Pose2d.fromTranslation(Constants.kVehicleToModuleThree));
+            waypoints.add(new Pose2d(firstTranslation.getTranslation(), Rotation2d.fromDegrees(180.0)));
+            Pose2d secondTranslation = new Pose2d(new Translation2d(Constants.kLeftSwitchFarCorner.x() + 3.65, Constants.kLeftSwitchFarCorner.y() + 0.25), Rotation2d.fromDegrees(175.0)).transformBy(Pose2d.fromTranslation(Constants.kVehicleToModuleThree));
+            waypoints.add(new Pose2d(secondTranslation.getTranslation(), Rotation2d.fromDegrees(135.0)));
+
+            PathfinderPath path = PathManager.mAlternateLeftmostCube;
+            return generateTrajectory(false, waypoints, Arrays.asList(), path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage, 3.8, 1);
         }
 
         private Trajectory<TimedState<Pose2dWithCurvature>> getSecondCubeToRightScale(){
@@ -265,8 +276,19 @@ public class TrajectoryGenerator {
     }
 
     public Trajectory<TimedState<Pose2dWithCurvature>> convertPath(PathfinderPath path, double defaultCook,
-    List<TimingConstraint<Pose2dWithCurvature>> constraints){
+        List<TimingConstraint<Pose2dWithCurvature>> constraints){
         return generateTrajectory(false, convertWaypoints(path), constraints, 
             path.maxSpeed, path.maxAccel, path.maxAccel, kMaxVoltage, defaultCook, 1);
+    }
+
+    public Trajectory<TimedState<Pose2dWithCurvature>> recenterPath(PathfinderPath path, double defaultCook,
+        Translation2d followingCenter){
+        List<Pose2d> waypoints = new ArrayList<>();
+    	for(Waypoint waypoint : path.getWaypoints()){
+            Pose2d robotCenterPose = new Pose2d(new Translation2d(waypoint.x, waypoint.y), Rotation2d.fromRadians(waypoint.angle));
+    		waypoints.add(robotCenterPose.transformBy(Pose2d.fromTranslation(followingCenter)));
+        }
+        return generateTrajectory(false, waypoints, Arrays.asList(), path.maxSpeed, path.maxAccel,
+            path.maxAccel, kMaxVoltage, defaultCook, 1);
     }
 }

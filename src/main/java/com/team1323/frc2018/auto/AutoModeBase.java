@@ -18,6 +18,10 @@ public abstract class AutoModeBase {
 
     protected static TrajectoryGenerator.TrajectorySet trajectories = TrajectoryGenerator.getInstance().getTrajectorySet();
 
+    public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
+        return new ArrayList<>();
+    }
+
     protected abstract void routine() throws AutoModeEndedException;
 
     public void run() {

@@ -310,16 +310,23 @@ public class Swerve extends Subsystem{
 		headingController.setSnapTarget(goalHeading);
 		setState(ControlState.PATH_FOLLOWING);
 	}
+
+	public synchronized void setTrajectory(TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
+		double rotationScalar, Translation2d followingCenter){
+			hasFinishedPath = false;
+			motionPlanner.reset();
+			motionPlanner.setTrajectory(trajectory);
+			motionPlanner.setFollowingCenter(followingCenter);
+			inverseKinematics.setCenterOfRotation(followingCenter);
+			setAbsolutePathHeading(targetHeading);
+			this.rotationScalar = rotationScalar;
+			trajectoryStartTime = Timer.getFPGATimestamp();
+			setState(ControlState.TRAJECTORY);
+		}
 	
 	public synchronized void setTrajectory(TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 			double rotationScalar){
-		hasFinishedPath = false;
-		motionPlanner.reset();
-		motionPlanner.setTrajectory(trajectory);
-		setAbsolutePathHeading(targetHeading);
-		this.rotationScalar = rotationScalar;
-		trajectoryStartTime = Timer.getFPGATimestamp();
-		setState(ControlState.TRAJECTORY);
+		setTrajectory(trajectory, targetHeading, rotationScalar, Translation2d.identity());
 	}
 	
 	/****************************************************/
