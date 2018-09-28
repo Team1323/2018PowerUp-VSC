@@ -10,7 +10,7 @@ import com.team1323.frc2018.auto.actions.DriveStraightAction;
 import com.team1323.frc2018.auto.actions.ResetPoseAction;
 import com.team1323.frc2018.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2018.auto.actions.WaitAction;
-import com.team1323.frc2018.auto.actions.WaitForElevatorAction;
+import com.team1323.frc2018.auto.actions.WaitForHeadingAction;
 import com.team1323.frc2018.auto.actions.WaitForWallAction;
 import com.team1323.frc2018.auto.actions.WaitToFinishPathAction;
 import com.team1323.frc2018.auto.actions.WaitToIntakeCubeAction;
@@ -82,14 +82,15 @@ public class RightScaleMode extends AutoModeBase{
 		System.out.println("Second cube intaken at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new SetTrajectoryAction(trajectories.alternateRightCubeToRightScale, -40.0, 1.25));//-55.0
 		runAction(new WaitAction(0.25));
-		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 75.0));//55.0
+		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));//55.0
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(-0.4));
+		s.request(intake.ejectRequest(-0.3));
 		System.out.println("Second cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.alternateRightScaleToSecondCube, -130.0, 0.5));//-135.0
 		runAction(new WaitAction(0.75));
+		//runAction(new WaitForHeadingAction(-180.0, -70.0));
 		s.request(s.elevatorWristIntakeConfig(
 				Constants.kElevatorIntakingHeight, 
 				Constants.kWristIntakingAngle, 
@@ -105,14 +106,14 @@ public class RightScaleMode extends AutoModeBase{
 			runAction(new WaitToIntakeCubeAction(1.5));
 		}
 		System.out.println("Third Cube intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		runAction(new SetTrajectoryAction(trajectories.secondCubeToRightScale, -30.0, 1.25));
+		runAction(new SetTrajectoryAction(trajectories.secondCubeToRightScale, -40.0, 1.25));
 		runAction(new WaitAction(0.25));
 		/*s.request(Wrist.getInstance().angleRequest(Constants.kWristPrimaryStowAngle));
 		runAction(new WaitToFinishPathAction());*/
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 65.0));//55.0
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
+		s.request(intake.ejectRequest(-0.3));
 		System.out.println("Third cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 	}
 

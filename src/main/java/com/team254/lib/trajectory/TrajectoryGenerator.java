@@ -203,7 +203,7 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             Pose2d firstTranslation = new Pose2d(new Translation2d(22.75, Constants.kLeftSwitchCloseCorner.y() - Constants.kRobotHalfLength - 1.0), Rotation2d.fromDegrees(65.0)).transformBy(Pose2d.fromTranslation(Constants.kVehicleToModuleThree));
             waypoints.add(new Pose2d(firstTranslation.getTranslation(), Rotation2d.fromDegrees(180.0)));
-            Pose2d secondTranslation = new Pose2d(new Translation2d(Constants.kLeftSwitchFarCorner.x() + 3.65, Constants.kLeftSwitchFarCorner.y() + 0.25), Rotation2d.fromDegrees(175.0)).transformBy(Pose2d.fromTranslation(Constants.kVehicleToModuleThree));
+            Pose2d secondTranslation = new Pose2d(new Translation2d(Constants.kLeftSwitchFarCorner.x() + 3.75, Constants.kLeftSwitchFarCorner.y() + 0.25), Rotation2d.fromDegrees(175.0)).transformBy(Pose2d.fromTranslation(Constants.kVehicleToModuleThree));
             waypoints.add(new Pose2d(secondTranslation.getTranslation(), Rotation2d.fromDegrees(135.0)));
 
             PathfinderPath path = PathManager.mAlternateLeftmostCube;

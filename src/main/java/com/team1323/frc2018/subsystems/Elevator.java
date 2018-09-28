@@ -1,5 +1,8 @@
 package com.team1323.frc2018.subsystems;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -24,6 +27,7 @@ public class Elevator extends Subsystem{
 	}
 	
 	LazyTalonSRX master, motor2, motor3, motor4;
+	List<LazyTalonSRX> motors, slaves;
 	Solenoid shifter, latch, forks;
 	private double targetHeight = 0.0;
 	private boolean isHighGear = true;
@@ -66,30 +70,28 @@ public class Elevator extends Subsystem{
 		motor3 = new LazyTalonSRX(Ports.ELEVATOR_3);
 		motor4 = new LazyTalonSRX(Ports.ELEVATOR_4);
 
-		motor2.set(ControlMode.Follower, Ports.ELEVATOR_1);
-		motor3.set(ControlMode.Follower, Ports.ELEVATOR_1);
-		motor4.set(ControlMode.Follower, Ports.ELEVATOR_1);
+		motors = Arrays.asList(master, motor2, motor3, motor4);
+		slaves = Arrays.asList(motor2, motor3, motor4);
+
+		slaves.forEach((s) -> s.set(ControlMode.Follower, Ports.ELEVATOR_1));
 		
 		shifter = new Solenoid(20, Ports.ELEVATOR_SHIFTER);
 		latch = new Solenoid(20, Ports.ELEVATOR_RELEASE_PISTON);
 		forks = new Solenoid(20, Ports.FORKS);
 		
-		master.configVoltageCompSaturation(12.0, 10);
-		master.enableVoltageCompensation(true);
-		motor2.configVoltageCompSaturation(12.0, 10);
-		motor2.enableVoltageCompensation(true);
-		motor3.configVoltageCompSaturation(12.0, 10);
-		motor3.enableVoltageCompensation(true);
-		motor4.configVoltageCompSaturation(12.0, 10);
-		motor4.enableVoltageCompensation(true);
+		for(LazyTalonSRX motor : motors){
+			motor.configVoltageCompSaturation(12.0, 10);
+			motor.enableVoltageCompensation(true);
+			motor.setNeutralMode(NeutralMode.Brake);
+		}
 		
-		master.setInverted(true);
+		master.setInverted(false);
 		motor2.setInverted(true);
-		motor3.setInverted(true);
+		motor3.setInverted(false);
 		motor4.setInverted(true);
 		
 		master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
-		master.setSensorPhase(true);
+		master.setSensorPhase(false);
 		zeroSensors();
 		master.configReverseSoftLimitThreshold(Constants.kElevatorEncoderStartingPosition, 10);
 		master.configForwardSoftLimitThreshold(Constants.kElevatorEncoderStartingPosition + feetToEncUnits(Constants.kElevatorMaxHeight), 10);
@@ -100,10 +102,6 @@ public class Elevator extends Subsystem{
 		setCurrentLimit(Constants.kELevatorCurrentLimit);
 		
 		//resetToAbsolutePosition();
-		master.setNeutralMode(NeutralMode.Brake);
-		motor2.setNeutralMode(NeutralMode.Brake);
-		motor3.setNeutralMode(NeutralMode.Brake);
-		motor4.setNeutralMode(NeutralMode.Brake);
 		configForLifting();
 	}
 	
@@ -172,7 +170,7 @@ public class Elevator extends Subsystem{
 	
 	public void configForAutoSpeed(){
 		/*kExtraNyooms might be false, so we have to make sure to set the PID values
-		for the faster elevator speed, even if its redundant.*/
+		for the faster elevator speed, even if it's redundant.*/
 		if(Constants.kIsUsingCompBot){
 			master.config_kP(0, 1.5, 10);
 			master.config_kI(0, 0.0, 10);
@@ -215,18 +213,12 @@ public class Elevator extends Subsystem{
 	}
 	
 	public void setCurrentLimit(int amps){
-		master.configContinuousCurrentLimit(amps, 10);
-		master.configPeakCurrentLimit(amps, 10);
-		master.configPeakCurrentDuration(10, 10);
-		master.enableCurrentLimit(true);
-		motor2.configContinuousCurrentLimit(amps, 10);
-		motor2.configPeakCurrentLimit(amps, 10);
-		motor2.configPeakCurrentDuration(10, 10);
-		motor2.enableCurrentLimit(true);
-		motor3.configContinuousCurrentLimit(amps, 10);
-		motor3.configPeakCurrentLimit(amps, 10);
-		motor3.configPeakCurrentDuration(10, 10);
-		motor3.enableCurrentLimit(true);
+		for(LazyTalonSRX motor : motors){
+			motor.configContinuousCurrentLimit(amps, 10);
+			motor.configPeakCurrentLimit(amps, 10);
+			motor.configPeakCurrentDuration(10, 10);
+			motor.enableCurrentLimit(true);
+		}
 	}
 	
 	public void fireLatch(boolean fire){
@@ -481,6 +473,7 @@ public class Elevator extends Subsystem{
 		//SmartDashboard.putNumber("Elevator 1 Current", periodicIO.current);
 		//SmartDashboard.putNumber("Elevator 2 Current", motor2.getOutputCurrent());
 		//SmartDashboard.putNumber("Elevator 3 Current", motor3.getOutputCurrent());
+		//SmartDashboard.putNumber("Elevator 4 Current", motor4.getOutputCurrent());
 		//SmartDashboard.putNumber("Elevator Voltage", periodicIO.voltage);
 		//SmartDashboard.putNumber("Elevator 2 Voltage", motor2.getMotorOutputVoltage());
 		//SmartDashboard.putNumber("Elevator 3 Voltage", motor3.getMotorOutputVoltage());
@@ -498,7 +491,8 @@ public class Elevator extends Subsystem{
 		double currentMinimum = 0.5;
 		double currentMaximum = 20.0;
 		double timeInterval = 1.0;
-		double testOutput = 8.0/12.0;
+		double testOutput = 4.0/12.0;
+		double outputDirection = 1.0;
 		
 		boolean passed = true;
 		
@@ -506,14 +500,17 @@ public class Elevator extends Subsystem{
 			System.out.println("Elevator sensor not connected, connect and retest");
 			return false;
 		}
+
+		configForHanging();
 		
-		master.configForwardSoftLimitEnable(false, 10);
-		master.configReverseSoftLimitEnable(false, 10);
+		//master.configForwardSoftLimitEnable(false, 10);
+		//master.configReverseSoftLimitEnable(false, 10);
 		
-		motor2.set(ControlMode.PercentOutput, 0.0);
-		motor3.set(ControlMode.PercentOutput, 0.0);
-		motor4.set(ControlMode.PercentOutput, 0.0);
-		
+		motors.forEach((m) -> m.set(ControlMode.PercentOutput, 0.0));
+		motors.forEach((m) -> m.setNeutralMode(NeutralMode.Coast));
+
+		Timer.delay(0.25);
+
 		double startingEncPosition = master.getSelectedSensorPosition(0);
 		master.set(ControlMode.PercentOutput, testOutput);
 		Timer.delay(timeInterval);
@@ -589,9 +586,36 @@ public class Elevator extends Subsystem{
 		}else{
 			System.out.println("Elevator motor 4 current good: " + current);
 		}
-		
-		master.configForwardSoftLimitEnable(true, 10);
-		master.configReverseSoftLimitEnable(true, 10);
+
+		/*for(LazyTalonSRX motor : motors){
+			int index = (motors.indexOf(motor) + 1);
+			double startingEncPosition = master.getSelectedSensorPosition(0);
+			motor.set(ControlMode.PercentOutput, testOutput*outputDirection);
+			Timer.delay(timeInterval / 2.0);
+			double current = motor.getOutputCurrent();
+			Timer.delay(timeInterval / 2.0);
+			motor.set(ControlMode.PercentOutput, 0.0);
+			if(Math.signum(master.getSelectedSensorPosition(0) - startingEncPosition) != outputDirection){
+				System.out.println("Elevator motor " + index + " needs to be reversed");
+				passed = false;
+			}
+			if(current < currentMinimum){
+				System.out.println("Elevator motor " + index + " current too low: " + current);
+				passed = false;
+			}else if(current > currentMaximum){
+				System.out.println("Elevator motor " + index + " current too high: " + current);
+				passed = false;
+			}else{
+				System.out.println("Elevator motor " + index + "current good: " + current);
+			}
+
+			outputDirection *= -1.0;
+		}*/
+
+		slaves.forEach((s) -> s.set(ControlMode.Follower, Ports.ELEVATOR_1));
+		motors.forEach((m) -> m.setNeutralMode(NeutralMode.Brake));
+		//master.configForwardSoftLimitEnable(true, 10);
+		//master.configReverseSoftLimitEnable(true, 10);
 		
 		configForLifting();
 		

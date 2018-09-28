@@ -79,10 +79,10 @@ public class Constants {
     public static final double kSwerveRotationSpeedScalar = ((1.0 / 0.125) - 1.0) / kSwerveMaxSpeedFeetPerSecond;
     
     //Swerve Module Wheel Offsets (Rotation encoder values when the wheels are facing 0 degrees)
-	public static final int kFrontRightEncoderStartingPos = kIsUsingCompBot ? -1739 : -3614;
-	public static final int kFrontLeftEncoderStartingPos = kIsUsingCompBot ? -1581 : -2578;
-	public static final int kRearLeftEncoderStartingPos = kIsUsingCompBot ? -40 : -1504;
-	public static final int kRearRightEncoderStartingPos = kIsUsingCompBot ? -3503 : -3209;
+	public static final int kFrontRightEncoderStartingPos = kIsUsingCompBot ? -3799 : -3614;
+	public static final int kFrontLeftEncoderStartingPos = kIsUsingCompBot ? -198 : -2578;
+	public static final int kRearLeftEncoderStartingPos = kIsUsingCompBot ? -2825 : -1504;
+	public static final int kRearRightEncoderStartingPos = kIsUsingCompBot ? -2013 : -3209;
 	
 	//Swerve Module Positions (relative to the center of the drive base)
 	public static final Translation2d kVehicleToModuleZero = new Translation2d(kWheelbaseLength/2, kWheelbaseWidth/2);
@@ -115,8 +115,8 @@ public class Constants {
 	public static final double kSwerveEncUnitsPerInch = kSwerveEncUnitsPerWheelRev / (Math.PI * kSwerveWheelDiameter);
 	
 	//Elevator Constants
-	public static final double kElevatorMaxSpeedHighGear = (kIsUsingCompBot ? 624.95829 : 363.388) * 4096.0 / 600.0; //encoder units per 100 ms (4266)
-	public static final double kElevatorMaxSpeedLowGear = 148.0 * 4096.0 / 600.0; //encoder units per 100 ms
+	public static final double kElevatorMaxSpeedHighGear = (kIsUsingCompBot ? 535.6785 : 363.388) * 4096.0 / 600.0; //encoder units per 100 ms (4266)
+	public static final double kElevatorMaxSpeedLowGear = 169.67 * 4096.0 / 600.0; //encoder units per 100 ms
 	/**
 	 * Pulse width position of the elevator encoder when it has fully descended.
 	 */

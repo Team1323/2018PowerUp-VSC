@@ -102,7 +102,9 @@ public class SmartDashboardInteractions {
     			case "RR":
     				//fall-through intended
     			case "LR":
-    				return new RightScaleMode();
+					return new RightScaleMode();
+				case "TT":
+    				return new TestMode();
     			default:
     				System.out.println("ERROR: unexpected auto mode: " + option);
                     return new StandStillMode();

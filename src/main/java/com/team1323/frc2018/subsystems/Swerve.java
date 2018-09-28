@@ -76,8 +76,12 @@ public class Swerve extends Subsystem{
 	double previousPathfinderVelocity = 0.0;
 	Rotation2d lastSteeringDirection;
 	boolean modulesReady = false;
+	boolean alwaysConfigureModules = false;
 	public void requireModuleConfiguration(){
 		modulesReady = false;
+	}
+	public void alwaysConfigureModules(){
+		alwaysConfigureModules = true;
 	}
 	boolean hasFinishedPath = false;
 	public boolean hasFinishedPath(){
@@ -569,6 +573,7 @@ public class Swerve extends Subsystem{
 				if(!hasFinishedPath){ 
 					System.out.println("Path completed in: " + (timestamp - trajectoryStartTime));
 					hasFinishedPath = true;
+					if(alwaysConfigureModules) requireModuleConfiguration();
 				}
 				stop();
 			}

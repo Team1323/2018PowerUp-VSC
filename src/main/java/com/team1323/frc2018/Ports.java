@@ -30,8 +30,8 @@ public class Ports {
     public static final int INTAKE_CLAMPERS = 1;
     
     public static final int ELEVATOR_SHIFTER = 2;
-    public static final int ELEVATOR_RELEASE_PISTON = 3;
-    public static final int FORKS = 4;
+    public static final int ELEVATOR_RELEASE_PISTON = 4;
+    public static final int FORKS = 3;
     
     //Digital Inputs
     public static final int INTAKE_BANNER = 0;
