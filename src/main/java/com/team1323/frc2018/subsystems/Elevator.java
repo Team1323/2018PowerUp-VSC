@@ -29,6 +29,7 @@ public class Elevator extends Subsystem{
 	LazyTalonSRX master, motor2, motor3, motor4;
 	List<LazyTalonSRX> motors, slaves;
 	Solenoid shifter, latch, forks;
+	private double forkDeployTimestamp = Double.POSITIVE_INFINITY;
 	private double targetHeight = 0.0;
 	private boolean isHighGear = true;
 	public boolean isHighGear(){
@@ -227,6 +228,7 @@ public class Elevator extends Subsystem{
 
 	public void fireForks(boolean fire){
 		forks.set(fire);
+		if(fire) forkDeployTimestamp = Timer.getFPGATimestamp();
 	}
 
 	public void toggleForks(){
@@ -417,6 +419,12 @@ public class Elevator extends Subsystem{
 			if(getMotorsWithHighCurrent()){
 				DriverStation.reportError("Elevator current too high", false);
 				//stop();
+			}
+
+			if(!Double.isInfinite(forkDeployTimestamp)){
+				if(timestamp - forkDeployTimestamp >= 3.0){
+					fireForks(false);
+				}
 			}
 		}
 

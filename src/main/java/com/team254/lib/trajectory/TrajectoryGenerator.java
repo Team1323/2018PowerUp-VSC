@@ -98,7 +98,7 @@ public class TrajectoryGenerator {
     public static final Pose2d kLeftScaleScorePose = new Pose2d(new Translation2d(22.75, Constants.kLeftSwitchCloseCorner.y() - Constants.kRobotHalfLength - 1.0),
         Rotation2d.fromDegrees(0.0));
 
-    public static final Pose2d kSecondRightCubePose = new Pose2d(new Translation2d(Constants.kRightSwitchFarCorner.x() + 3.5, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25),
+    public static final Pose2d kSecondRightCubePose = new Pose2d(new Translation2d(Constants.kRightSwitchFarCorner.x() + 3.0, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25),
         Rotation2d.fromDegrees(90.0));
 
     public class TrajectorySet {
@@ -222,7 +222,7 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(new Translation2d(Constants.kRightSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kRightSwitchCloseCorner.y() - Constants.kRobotHalfWidth - 4.6), Rotation2d.fromDegrees(90.0)));
             waypoints.add(Pose2d.fromTranslation(Constants.kRightSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, Constants.kRobotHalfLength + 1.5))));
-            waypoints.add(Pose2d.fromTranslation(Constants.kRightScaleCorner.translateBy(new Translation2d(1.0, 3.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kRightScaleCorner.translateBy(new Translation2d(1.0, 5.25))));
 
             return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
         }
@@ -231,7 +231,7 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.2), Rotation2d.fromDegrees(90.0)));
             waypoints.add(Pose2d.fromTranslation(Constants.kRightSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, Constants.kRobotHalfLength + 1.5))));
-            waypoints.add(Pose2d.fromTranslation(Constants.kRightScaleCorner.translateBy(new Translation2d(1.0, 5.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kRightScaleCorner.translateBy(new Translation2d(1.0, 6.0))));
 
             return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
         }
@@ -240,7 +240,7 @@ public class TrajectoryGenerator {
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.2), Rotation2d.fromDegrees(-90.0)));
             waypoints.add(Pose2d.fromTranslation(Constants.kLeftSwitchCloseCorner.translateBy(new Translation2d(Constants.kRobotHalfWidth, -Constants.kRobotHalfLength - 1.5))));
-            waypoints.add(Pose2d.fromTranslation(Constants.kLeftScaleCorner.translateBy(new Translation2d(1.0, -3.5))));
+            waypoints.add(Pose2d.fromTranslation(Constants.kLeftScaleCorner.translateBy(new Translation2d(1.0, -5.25))));
 
             return generateTrajectory(false, waypoints, Arrays.asList(), 8.0, 10.0, 2.0, kMaxVoltage, 7.5, 1);
         }

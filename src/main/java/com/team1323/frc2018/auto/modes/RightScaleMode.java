@@ -62,7 +62,7 @@ public class RightScaleMode extends AutoModeBase{
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.rightScaleToFirstCube, -180.0, 1.0));
-		runAction(new WaitAction(0.5));
+		runAction(new WaitAction(0.75));
 		s.request(s.elevatorWristIntakeConfig(
 				Constants.kElevatorIntakingHeight, 
 				Constants.kWristIntakingAngle, 

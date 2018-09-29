@@ -396,7 +396,7 @@ public class Robot extends IterativeRobot {
 		}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){
 			//flip is disabled for now, due to our adoption of forks for CC
 			//superstructure.flipDriveTrain();
-			elevator.toggleForks();
+			elevator.fireForks(true);
 		}
 		
 		if(intake.needsToNotifyDrivers()){
