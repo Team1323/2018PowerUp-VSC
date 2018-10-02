@@ -2,11 +2,13 @@ package com.team1323.frc2018.subsystems;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
@@ -17,6 +19,7 @@ import com.team1323.lib.util.InterpolatingDouble;
 
 import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Superstructure extends Subsystem{
 	
@@ -24,7 +27,7 @@ public class Superstructure extends Subsystem{
 	public Wrist wrist;
 	public Elevator elevator;
 	
-	//private TalonSRX winch;
+	private TalonSRX winch;
 	private boolean winchSetpointSet = false;
 	
 	private Compressor compressor;
@@ -36,15 +39,17 @@ public class Superstructure extends Subsystem{
 		wrist = Wrist.getInstance();
 		elevator = Elevator.getInstance();
 		
-		/*winch = new TalonSRX(Ports.WINCH);
-		winch.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute, 0, 10);
+		winch = Pigeon.getInstance().getTalon();
+		winch.configRemoteFeedbackFilter(Ports.ELEVATOR_3, RemoteSensorSource.TalonSRX_SelectedSensor, 0, 10);
+		winch.configRemoteFeedbackFilter(Ports.ELEVATOR_3, RemoteSensorSource.Off, 1, 10);
+		winch.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0, 0, 10);
 		winch.setNeutralMode(NeutralMode.Brake);
 		winch.selectProfileSlot(0, 0);
 		winch.config_kP(0, 1.0, 10);
 		winch.config_kI(0, 0.0, 10);
 		winch.config_kD(0, 0.0, 10);
 		winch.config_kF(0, 0.0, 10);
-		winch.configAllowableClosedloopError(0, 0, 10);*/
+		winch.configAllowableClosedloopError(0, 0, 10);
 		
 		compressor = new Compressor(20);
 		
@@ -162,11 +167,21 @@ public class Superstructure extends Subsystem{
 			
 				double elevatorHeight = elevator.getHeight();
 				swerve.setMaxSpeed(Constants.kSwerveSpeedTreeMap.getInterpolated(new InterpolatingDouble(elevatorHeight)).value);
+
+				if(driveTrainFlipped()){
+					if(elevatorHeight < 2.5){
+						if(intake.getState() != IntakeState.OFF)
+							request(wristIntakeConfig(Constants.kWristHangingAngle, IntakeState.OFF));
+					}else if(intake.getState() != IntakeState.OPEN){
+						request(intake.stateRequest(IntakeState.OPEN));
+					}
+				}
 				
 				if(!activeRequestsCompleted){
 					if(newRequests){
 						if(activeRequests.isParallel()){
-							for(Request request : activeRequests.getRequests()){
+							for(Iterator<Request> iterator = activeRequests.getRequests().iterator(); iterator.hasNext();){
+								Request request = iterator.next();
 								request.act();
 							}
 							newRequests = false;
@@ -234,7 +249,7 @@ public class Superstructure extends Subsystem{
 	}
 	
 	public synchronized void requestWinchOpenLoop(double input){
-		/*if(driveTrainFlipped() && input != 0){
+		if(driveTrainFlipped() && input != 0){
 			winch.set(ControlMode.PercentOutput, input);
 			winchSetpointSet = false;
 		}else if(driveTrainFlipped() && !winchSetpointSet){
@@ -243,7 +258,7 @@ public class Superstructure extends Subsystem{
 		}else if(!driveTrainFlipped()){
 			winch.set(ControlMode.PercentOutput, 0.0);
 			winchSetpointSet = false;
-		}*/
+		}
 	}
 	
 	/**
@@ -299,7 +314,7 @@ public class Superstructure extends Subsystem{
 
 	@Override
 	public void outputTelemetry() {
-		
+		SmartDashboard.putNumber("Winch Encoder", winch.getSelectedSensorPosition(0));
 	}
 
 }

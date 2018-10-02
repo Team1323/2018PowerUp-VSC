@@ -9,7 +9,7 @@ public class DerpLeftCubeToLeftScalePath extends PathfinderPath{
 
 	public DerpLeftCubeToLeftScalePath(){
 		super.points = new Waypoint[]{
-			new Waypoint(Constants.kLeftSwitchFarCorner.x() + 3.5, Constants.kLeftSwitchFarCorner.y() + 0.5, Pathfinder.d2r(-45)),
+			new Waypoint(Constants.kLeftSwitchFarCorner.x() + 3.3, Constants.kLeftSwitchFarCorner.y() + 0.5, Pathfinder.d2r(-45)),
 			new Waypoint(21.75, 6.0, Pathfinder.d2r(-45))
 		};
 		super.maxSpeed = 8.0;

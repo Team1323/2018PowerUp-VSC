@@ -16,6 +16,7 @@ import com.team1323.frc2018.auto.actions.WaitForWallAction;
 import com.team1323.frc2018.auto.actions.WaitToFinishPathAction;
 import com.team1323.frc2018.auto.actions.WaitToIntakeCubeAction;
 import com.team1323.frc2018.auto.actions.WaitToPassXCoordinateAction;
+import com.team1323.frc2018.subsystems.Elevator;
 import com.team1323.frc2018.subsystems.Intake;
 import com.team1323.frc2018.subsystems.Intake.IntakeState;
 import com.team1323.frc2018.subsystems.RequestList;
@@ -55,10 +56,11 @@ public class LeftScaleMode extends AutoModeBase{
 		s.request(intake.stateRequest(IntakeState.CLAMPING));
 		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 65.0, 0.5));//50.0
 		Swerve.getInstance().alwaysConfigureModules();
+		Elevator.getInstance().configForTeleopSpeed();
 		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x()));
 		s.request(s.elevatorWristConfig(4.5, 66.0));//66.0
 		runAction(new WaitToFinishPathAction());
-		s.request(intake.ejectRequest(-0.55));
+		s.request(intake.ejectRequest(-0.53));
 		System.out.println("First Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.4));
 		runAction(new SetTrajectoryAction(trajectories.alternateLeftmostCube, 175.0, 1.0));
@@ -85,7 +87,7 @@ public class LeftScaleMode extends AutoModeBase{
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
 		runAction(new WaitToFinishPathAction());
 		runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(-0.65));
+		s.request(intake.ejectRequest(-0.6));
 		System.out.println("Second Cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.alternateLeftScaleToSecondCube, 150.0, 0.75));

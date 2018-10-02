@@ -135,7 +135,7 @@ public class Constants {
 	public static final double kElevatorMaxHeight = 5.4; //feet
 	public static final double kElevatorMaxCurrent = 50.0;//amps
 	public static final int kELevatorCurrentLimit = 20;
-	public static final double kElevatorMinimumHangingHeight = 0.70;
+	public static final double kElevatorMinimumHangingHeight = 0.795;
 	public static final double kElevatorMaximumHangingHeight = 3.25;
 	public static final double kElevatorHangingRampHeight = 3.452;
 	public static final double kElevatorTippingCubeHeight = 0.57;
@@ -171,6 +171,7 @@ public class Constants {
 	public static final double kWristIntakingAngle = kIsUsingCompBot ? 6.5 : 9.0;
 	public static final double kWristPrimaryStowAngle = 85.0;
 	public static final double kWristSecondaryStowAngle = 60.0;
+	public static final double kWristHangingAngle = 90.0;
 	public static final double kWristMaxStowHeight = 3.5; //height of the elevator
 	public static final double kWristMaxCurrent = 40.0;//amps
 	

@@ -20,11 +20,16 @@ public class Pigeon {
 	}
 	
 	private PigeonIMU pigeon;
+	private TalonSRX talon;
+
+	public TalonSRX getTalon(){
+		return talon;
+	}
     
 	private Pigeon(){
 		try{
-			//TODO plug the Pigeon into a different Talon on the comp bot
-			pigeon = new PigeonIMU(new TalonSRX(Ports.PIGEON_TALON));
+			talon = new TalonSRX(Ports.PIGEON_TALON);
+			pigeon = new PigeonIMU(talon);
 		}catch(Exception e){
 			System.out.println(e);
 		}

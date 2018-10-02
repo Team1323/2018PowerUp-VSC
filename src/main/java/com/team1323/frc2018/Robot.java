@@ -12,6 +12,7 @@ import java.util.Arrays;
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
 import com.team1323.frc2018.auto.modes.LLAssistMode;
+import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -111,7 +112,8 @@ public class Robot extends IterativeRobot {
 		
 		generator.generateTrajectories();
 
-		qTransmitter.addPaths(smartDashboardInteractions.getSelectedAutoMode(DriverStation.getInstance().getGameSpecificMessage().substring(0, 2)).getPaths());
+		//qTransmitter.addPaths(smartDashboardInteractions.getSelectedAutoMode(DriverStation.getInstance().getGameSpecificMessage().substring(0, 2)).getPaths());
+		qTransmitter.addPaths(new RightScaleMode().getPaths());
 	}
 	
 	public void allPeriodic(){
@@ -376,15 +378,15 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if(coDriver.rightBumper.isBeingPressed()){
-			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.FORCED_INTAKE));
+			superstructure.request(intake.stateRequest(IntakeState.FORCED_INTAKE));
 		}else if(intake.getState() == IntakeState.FORCED_INTAKE){
-			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OFF));
+			superstructure.request(intake.stateRequest(IntakeState.OFF));
 		}else if(coDriver.leftTrigger.wasPressed() || driver.leftBumper.wasPressed()){
-			superstructure.addForemostActiveRequest(intake.stateRequest(IntakeState.OPEN));
+			superstructure.request(intake.stateRequest(IntakeState.OPEN));
 		}else if(coDriver.rightTrigger.wasPressed() || driver.rightTrigger.wasPressed()){
 			superstructure.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
 		}else if(coDriver.rightTrigger.longPressed() || driver.rightTrigger.longPressed()){
-			superstructure.addForemostActiveRequest(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
+			superstructure.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
 		}
 		
 		if(driver.POV0.wasPressed()){
@@ -394,9 +396,8 @@ public class Robot extends IterativeRobot {
 		}else if(driver.POV180.wasPressed() && !elevator.isHighGear()){
 			//superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
 		}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){
-			//flip is disabled for now, due to our adoption of forks for CC
-			//superstructure.flipDriveTrain();
-			elevator.fireForks(true);
+			superstructure.flipDriveTrain();
+			//elevator.fireForks(true);
 		}
 		
 		if(intake.needsToNotifyDrivers()){
@@ -405,12 +406,13 @@ public class Robot extends IterativeRobot {
 		}
 		
 		if(coDriver.startButton.longPressed()){
-			elevator.setManualSpeed(0.25);
+			elevator.setManualSpeed(0.75);//0.25
 			superstructure.elevator.enableLimits(false);
 		}else if(!superstructure.elevator.limitsEnabled() && coDriver.getY(Hand.kLeft) == 0){
 			superstructure.elevator.zeroSensors();
 			superstructure.elevator.enableLimits(true);
 			elevator.setManualSpeed(Constants.kElevatorTeleopManualSpeed);
+			elevator.lockHeight();
 		}
 	}
 

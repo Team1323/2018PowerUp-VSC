@@ -6,6 +6,7 @@ import java.util.List;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.team1323.frc2018.Constants;
 import com.team1323.frc2018.Ports;
@@ -100,6 +101,9 @@ public class Elevator extends Subsystem{
 		master.configReverseSoftLimitEnable(true, 10);
 		enableLimits(true);
 		
+		//This sensor is used as a remote for the winch.
+		motor3.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+
 		setCurrentLimit(Constants.kELevatorCurrentLimit);
 		
 		//resetToAbsolutePosition();
@@ -424,6 +428,7 @@ public class Elevator extends Subsystem{
 			if(!Double.isInfinite(forkDeployTimestamp)){
 				if(timestamp - forkDeployTimestamp >= 3.0){
 					fireForks(false);
+					forkDeployTimestamp = Double.POSITIVE_INFINITY;
 				}
 			}
 		}
