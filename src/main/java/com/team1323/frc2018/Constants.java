@@ -115,7 +115,7 @@ public class Constants {
 	public static final double kSwerveEncUnitsPerInch = kSwerveEncUnitsPerWheelRev / (Math.PI * kSwerveWheelDiameter);
 	
 	//Elevator Constants
-	public static final double kElevatorMaxSpeedHighGear = (kIsUsingCompBot ? 535.6785 : 363.388) * 4096.0 / 600.0; //encoder units per 100 ms (4266)
+	public static final double kElevatorMaxSpeedHighGear = 535.6785 * 4096.0 / 600.0; //encoder units per 100 ms (4266)
 	public static final double kElevatorMaxSpeedLowGear = 169.67 * 4096.0 / 600.0; //encoder units per 100 ms
 	/**
 	 * Pulse width position of the elevator encoder when it has fully descended.
@@ -123,7 +123,7 @@ public class Constants {
 	public static final int kElevatorEncoderStartingPosition = 0;
 	public static final double kElevatorTicksPerFoot = 11983.0 / 2.5989583; //determined empirically
 	public static final double kElevatorHeightTolerance = 0.1; //feet
-	public static final double kElevatorIntakingHeight = 0.2; //feet
+	public static final double kElevatorIntakingHeight = kIsUsingCompBot ? 0.2 : 0.125; //feet
 	public static final double kElevatorSecondCubeHeight = 0.97;
 	public static final double kElevatorHumanLoadHeight = 1.836;
 	public static final double kElevatorSwitchHeight = 2.0; //feet

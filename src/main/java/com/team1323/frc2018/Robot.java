@@ -62,6 +62,7 @@ public class Robot extends IterativeRobot {
 	private TrajectoryGenerator generator = TrajectoryGenerator.getInstance();
 	private PathTransmitter transmitter = PathTransmitter.getInstance();
 	private QuinticPathTransmitter qTransmitter = QuinticPathTransmitter.getInstance();
+	private boolean pathsTransmitted = false;
 	private SmartDashboardInteractions smartDashboardInteractions = new SmartDashboardInteractions();
 
 	private Looper enabledLooper = new Looper();
@@ -110,10 +111,7 @@ public class Robot extends IterativeRobot {
 		smartDashboardInteractions.initWithDefaults();
 		//initCamera();
 		
-		generator.generateTrajectories();
-
-		//qTransmitter.addPaths(smartDashboardInteractions.getSelectedAutoMode(DriverStation.getInstance().getGameSpecificMessage().substring(0, 2)).getPaths());
-		qTransmitter.addPaths(new RightScaleMode().getPaths());
+		generator.generateTrajectories();		
 	}
 	
 	public void allPeriodic(){
@@ -228,6 +226,11 @@ public class Robot extends IterativeRobot {
 			disabledLooper.start();
 			elevator.fireLatch(false);
 			elevator.fireForks(false);
+
+			if(!pathsTransmitted){
+				qTransmitter.addPaths(smartDashboardInteractions.getSelectedAutoMode(DriverStation.getInstance().getGameSpecificMessage().substring(0, 2)).getPaths());
+				pathsTransmitted = true;
+			}
 		}catch(Throwable t){
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -408,7 +411,8 @@ public class Robot extends IterativeRobot {
 		if(coDriver.startButton.longPressed()){
 			elevator.setManualSpeed(0.75);//0.25
 			superstructure.elevator.enableLimits(false);
-		}else if(!superstructure.elevator.limitsEnabled() && coDriver.getY(Hand.kLeft) == 0){
+			coDriver.rumble(1.0, 1.0);
+		}else if(!superstructure.elevator.limitsEnabled() && coDriver.startButton.longReleased()){
 			superstructure.elevator.zeroSensors();
 			superstructure.elevator.enableLimits(true);
 			elevator.setManualSpeed(Constants.kElevatorTeleopManualSpeed);

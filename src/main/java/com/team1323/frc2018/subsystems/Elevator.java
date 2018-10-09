@@ -100,7 +100,7 @@ public class Elevator extends Subsystem{
 		}
 		
 		master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
-		master.setSensorPhase(false);
+		master.setSensorPhase(!Constants.kIsUsingCompBot);
 		zeroSensors();
 		master.configReverseSoftLimitThreshold(Constants.kElevatorEncoderStartingPosition, 10);
 		master.configForwardSoftLimitThreshold(Constants.kElevatorEncoderStartingPosition + feetToEncUnits(Constants.kElevatorMaxHeight), 10);
@@ -128,53 +128,34 @@ public class Elevator extends Subsystem{
 		setHighGear(true);
 		
 		manualSpeed = Constants.kElevatorTeleopManualSpeed;
-		
-		if(Constants.kIsUsingCompBot){
-			master.selectProfileSlot(0, 0);
-			master.config_kP(0, 1.5, 10);
-			master.config_kI(0, 0.0, 10);
-			master.config_kD(0, 90.0, 10);
-			master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
-			
-			if(Constants.kExtraNyooms){
-				master.config_kP(1, 1.5, 10);
-				master.config_kI(1, 0.0, 10);
-				master.config_kD(1, 45.0, 10);//90.0
-				master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
-			}else{
-				master.config_kP(1, 0.5, 10);
-				master.config_kI(1, 0.0, 10);
-				master.config_kD(1, 90.0, 10);
-				master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
-			}
-			
-			/*If you decide to go back to full speed on the comp bot, just change the downward PID to match
-			the upward PID (as a baseline). Right now it's tuned to be slower, until we can identify
-			the source of overshoot and encoder reset.*/
-			if(Constants.kExtraNyooms){
-				master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 1.0), 10);
-				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 1.5), 10);
-			}else{
-				master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 0.7), 10);
-				master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 5.0), 10);
-			}
-		}else{
-			//The practice bot still has the old gearing, and therefore
-			//requires different PID values.
 
-			master.selectProfileSlot(0, 0);
-			master.config_kP(0, 4.0, 10);
-			master.config_kI(0, 0.0, 10);
-			master.config_kD(0, 160.0, 10);
-			master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
-			
-			master.config_kP(1, 1.0, 10);
+		master.selectProfileSlot(0, 0);
+		master.config_kP(0, 1.5, 10);
+		master.config_kI(0, 0.0, 10);
+		master.config_kD(0, 90.0, 10);
+		master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+		
+		if(Constants.kExtraNyooms){
+			master.config_kP(1, 1.5, 10);
 			master.config_kI(1, 0.0, 10);
-			master.config_kD(1, 70.0, 10);
+			master.config_kD(1, 45.0, 10);//90.0
 			master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
-			
-			master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 0.9), 10);
-			master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear* 3.0), 10);
+		}else{
+			master.config_kP(1, 0.5, 10);
+			master.config_kI(1, 0.0, 10);
+			master.config_kD(1, 90.0, 10);
+			master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+		}
+		
+		/*If you decide to go back to full speed on the comp bot, just change the downward PID to match
+		the upward PID (as a baseline). Right now it's tuned to be slower, until we can identify
+		the source of overshoot and encoder reset.*/
+		if(Constants.kExtraNyooms){
+			master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 1.0), 10);
+			master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 1.5), 10);
+		}else{
+			master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear * 0.7), 10);
+			master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear * 5.0), 10);
 		}
 	}
 	
@@ -185,17 +166,15 @@ public class Elevator extends Subsystem{
 	public void configForAutoSpeed(){
 		/*kExtraNyooms might be false, so we have to make sure to set the PID values
 		for the faster elevator speed, even if it's redundant.*/
-		if(Constants.kIsUsingCompBot){
-			master.config_kP(0, 1.5, 10);
-			master.config_kI(0, 0.0, 10);
-			master.config_kD(0, 90.0, 10);
-			master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
+		master.config_kP(0, 1.5, 10);
+		master.config_kI(0, 0.0, 10);
+		master.config_kD(0, 90.0, 10);
+		master.config_kF(0, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 
-			master.config_kP(1, 1.5, 10);
-			master.config_kI(1, 0.0, 10);
-			master.config_kD(1, 90.0, 10);
-			master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
-		}
+		master.config_kP(1, 1.5, 10);
+		master.config_kI(1, 0.0, 10);
+		master.config_kD(1, 90.0, 10);
+		master.config_kF(1, 1023.0/Constants.kElevatorMaxSpeedHighGear, 10);
 
 		master.configMotionCruiseVelocity((int)(Constants.kElevatorMaxSpeedHighGear*1.0), 10);
 		master.configMotionAcceleration((int)(Constants.kElevatorMaxSpeedHighGear*3.0), 10);

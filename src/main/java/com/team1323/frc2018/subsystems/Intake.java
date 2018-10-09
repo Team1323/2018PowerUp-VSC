@@ -30,6 +30,9 @@ public class Intake extends Subsystem{
 	private TalonSRX leftIntake, rightIntake;
 	private Solenoid pinchers, clampers;
 	private DigitalInput banner;
+	public boolean getBanner(){
+		return banner.get();
+	}
 	
 	private Intake(){
 		//leftIntake = TalonSRXFactory.createDefaultTalon(Ports.INTAKE_LEFT);
