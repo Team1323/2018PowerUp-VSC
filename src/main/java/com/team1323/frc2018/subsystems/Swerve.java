@@ -107,7 +107,7 @@ public class Swerve extends Subsystem{
 		modules = Arrays.asList(frontRight, frontLeft, rearLeft, rearRight);
 		positionModules = Arrays.asList(frontRight, frontLeft, rearRight);
 		
-		rearLeft.disableDriveEncoder();
+		//rearLeft.disableDriveEncoder();
 		
 		rearLeft.invertDriveMotor(true);
 		frontLeft.invertDriveMotor(true);
@@ -356,8 +356,8 @@ public class Swerve extends Subsystem{
 	}
 	
 	public synchronized void updatePose(double timestamp){
-		double x = 0;
-		double y = 0;
+		double x = 0.0;
+		double y = 0.0;
 		Rotation2d heading = pigeon.getAngle();
 		
 		double averageDistance = 0.0;
@@ -409,6 +409,58 @@ public class Swerve extends Subsystem{
 		pose = updatedPose;
 		modules.forEach((m) -> m.resetPose(pose));
 	}
+
+	//Playing around with different methods of odometry. This will require the use of all four modules, however.
+	public synchronized void alternatePoseUpdate(){
+		double x = 0.0;
+		double y = 0.0;
+		Rotation2d heading = pigeon.getAngle();
+		
+		double[][] distances = new double[4][2];
+		for(SwerveDriveModule m : modules){
+			m.updatePose(heading);
+			double distance = m.getEstimatedRobotPose().getTranslation().distance(pose.getTranslation());
+			distances[m.moduleID][0] = m.moduleID;
+			distances[m.moduleID][1] = distance;
+		}
+		
+		Arrays.sort(distances, new java.util.Comparator<double[]>() {
+			public int compare(double[] a, double[] b) {
+				return Double.compare(a[1], b[1]);
+			}
+		});
+		List<SwerveDriveModule> modulesToUse = new ArrayList<>();
+		double firstDifference = distances[1][1] - distances[0][1];
+		double secondDifference = distances[2][1] - distances[1][1];
+		double thirdDifference = distances[3][1] - distances[2][1];
+		if(secondDifference > (1.5 * firstDifference)){
+			modulesToUse.add(modules.get((int)distances[0][0]));
+			modulesToUse.add(modules.get((int)distances[1][0]));
+		}else if(thirdDifference > (1.5 * firstDifference)){
+			modulesToUse.add(modules.get((int)distances[0][0]));
+			modulesToUse.add(modules.get((int)distances[1][0]));
+			modulesToUse.add(modules.get((int)distances[2][0]));
+		}else{
+			modulesToUse.add(modules.get((int)distances[0][0]));
+			modulesToUse.add(modules.get((int)distances[1][0]));
+			modulesToUse.add(modules.get((int)distances[2][0]));
+			modulesToUse.add(modules.get((int)distances[3][0]));
+		}
+		
+		SmartDashboard.putNumber("Modules Used", modulesToUse.size());
+		
+		for(SwerveDriveModule m : modulesToUse){
+			x += m.getEstimatedRobotPose().getTranslation().x();
+			y += m.getEstimatedRobotPose().getTranslation().y();
+		}
+
+		Pose2d updatedPose = new Pose2d(new Translation2d(x / modulesToUse.size(), y / modulesToUse.size()), heading);
+		double deltaPos = updatedPose.getTranslation().distance(pose.getTranslation());
+		distanceTraveled += deltaPos;
+		pose = updatedPose;
+		modules.forEach((m) -> m.resetPose(pose));
+	}
+
 	double lastHyp = 0.0;
 	public synchronized void updateControlCycle(double timestamp){
 		//if(currentState == ControlState.TRAJECTORY) headingController.setSnapTarget(motionPlanner.getHeading());
@@ -607,11 +659,11 @@ public class Swerve extends Subsystem{
 		@Override
 		public void onLoop(double timestamp) {
 			synchronized(Swerve.this){
-				//readPeriodicInputs();
-				if(modulesReady || (getState() != ControlState.PATH_FOLLOWING))
-					updatePose(timestamp);
+				if(modulesReady || (getState() != ControlState.PATH_FOLLOWING && getState() != ControlState.TRAJECTORY)){
+					//updatePose(timestamp);
+					alternatePoseUpdate();
+				}
 				updateControlCycle(timestamp);
-				//writePeriodicOutputs();
 				lastUpdateTimestamp = timestamp;
 			}
 		}
