@@ -87,10 +87,17 @@ public class Elevator extends Subsystem{
 			motor.setNeutralMode(NeutralMode.Brake);
 		}
 		
-		master.setInverted(false);
-		motor2.setInverted(true);
-		motor3.setInverted(false);
-		motor4.setInverted(true);
+		if(Constants.kIsUsingCompBot){
+			master.setInverted(false);
+			motor2.setInverted(true);
+			motor3.setInverted(false);
+			motor4.setInverted(true);
+		}else{
+			master.setInverted(true);
+			motor2.setInverted(true);
+			motor3.setInverted(true);
+			motor4.setInverted(false);
+		}
 		
 		master.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 		master.setSensorPhase(false);
@@ -101,8 +108,10 @@ public class Elevator extends Subsystem{
 		master.configReverseSoftLimitEnable(true, 10);
 		enableLimits(true);
 		
-		//This sensor is used as a remote for the winch.
-		motor3.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		if(Constants.kIsUsingCompBot){
+			//This sensor is used as a remote for the winch.
+			motor3.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
+		}
 
 		setCurrentLimit(Constants.kELevatorCurrentLimit);
 		

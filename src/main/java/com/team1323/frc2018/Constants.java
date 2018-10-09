@@ -14,8 +14,8 @@ public class Constants {
 	
 	public static final double kEpsilon = 0.0001;
 	
-	public static final boolean kIsUsingCompBot = true;
-	public static final boolean kIsUsingTractionWheels = true;
+	public static final boolean kIsUsingCompBot = false;
+	public static final boolean kIsUsingTractionWheels = false;
 	public static final boolean kExtraNyooms = true;
 	
 	//Physical Robot Dimensions

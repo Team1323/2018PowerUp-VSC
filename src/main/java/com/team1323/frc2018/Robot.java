@@ -108,7 +108,7 @@ public class Robot extends IterativeRobot {
 		swerve.zeroSensors();
 		
 		smartDashboardInteractions.initWithDefaults();
-		initCamera();
+		//initCamera();
 		
 		generator.generateTrajectories();
 
@@ -334,7 +334,7 @@ public class Robot extends IterativeRobot {
 				else
 					superstructure.request(superstructure.elevatorWristIntakeConfig(0.31, 13.0, IntakeState.CLAMPING));
 			}else if(coDriver.xButton.wasPressed()){
-				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorSwitchHeight, 
+				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHumanLoadHeight, 
 						20.0, IntakeState.CLAMPING));
 			}else if(coDriver.xButton.longPressed()){
 				superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kElevatorHumanLoadHeight, 

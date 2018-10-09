@@ -14,6 +14,7 @@ import com.team254.lib.geometry.Pose2d;
 import com.team254.lib.geometry.Rotation2d;
 import com.team254.lib.geometry.Translation2d;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDriveModule extends Subsystem{
@@ -96,7 +97,10 @@ public class SwerveDriveModule extends Subsystem{
     	rotationMotor.config_kI(0, 0.0, 10);
     	rotationMotor.config_kD(0, 160.0, 10);//120 80?
     	rotationMotor.config_kF(0, 1023.0/Constants.kSwerveRotationMaxSpeed, 10);
-    	rotationMotor.set(ControlMode.MotionMagic, rotationMotor.getSelectedSensorPosition(0));
+		rotationMotor.set(ControlMode.MotionMagic, rotationMotor.getSelectedSensorPosition(0));
+		if(!isRotationSensorConnected())
+			DriverStation.reportError("Module " + moduleID + " rotation encoder not detected!", false);
+
     	driveMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
     	driveMotor.setSelectedSensorPosition(0, 0, 10);
     	driveMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, 10);
@@ -123,7 +127,19 @@ public class SwerveDriveModule extends Subsystem{
     	driveMotor.config_kD(1, 0.0, 10);
     	driveMotor.config_kF(1, 1023.0/Constants.kSwerveDriveMaxSpeed*0.65, 10);
     	driveMotor.configMotionCruiseVelocity((int)(Constants.kSwerveDriveMaxSpeed*0.9), 10);
-    	driveMotor.configMotionAcceleration((int)(Constants.kSwerveDriveMaxSpeed), 10);
+		driveMotor.configMotionAcceleration((int)(Constants.kSwerveDriveMaxSpeed), 10);
+		if(!isDriveSensorConnected())
+			DriverStation.reportError("Module " + moduleID + " drive encoder not detected!", false);
+	}
+
+	private boolean isRotationSensorConnected(){
+		int pulseWidthPeriod = rotationMotor.getSensorCollection().getPulseWidthRiseToRiseUs();
+		return pulseWidthPeriod != 0;
+	}
+
+	private boolean isDriveSensorConnected(){
+		int pulseWidthPeriod = driveMotor.getSensorCollection().getPulseWidthRiseToRiseUs();
+		return pulseWidthPeriod != 0;
 	}
 	
 	private double getRawAngle(){
