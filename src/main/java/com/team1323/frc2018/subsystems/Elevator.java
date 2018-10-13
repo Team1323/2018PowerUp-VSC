@@ -108,10 +108,11 @@ public class Elevator extends Subsystem{
 		master.configReverseSoftLimitEnable(true, 10);
 		enableLimits(true);
 		
-		if(Constants.kIsUsingCompBot){
-			//This sensor is used as a remote for the winch.
+		//This sensor is used as a remote for the winch.
+		if(Constants.kIsUsingCompBot)
 			motor3.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
-		}
+		else
+			motor4.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, 0, 10);
 
 		setCurrentLimit(Constants.kELevatorCurrentLimit);
 		

@@ -41,18 +41,16 @@ public class Superstructure extends Subsystem{
 		
 		winch = Pigeon.getInstance().getTalon();
 
-		if(Constants.kIsUsingCompBot){
-			winch.configRemoteFeedbackFilter(Ports.ELEVATOR_3, RemoteSensorSource.TalonSRX_SelectedSensor, 0, 10);
-			winch.configRemoteFeedbackFilter(Ports.ELEVATOR_3, RemoteSensorSource.Off, 1, 10);
-			winch.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0, 0, 10);
-			winch.setNeutralMode(NeutralMode.Brake);
-			winch.selectProfileSlot(0, 0);
-			winch.config_kP(0, 1.0, 10);
-			winch.config_kI(0, 0.0, 10);
-			winch.config_kD(0, 0.0, 10);
-			winch.config_kF(0, 0.0, 10);
-			winch.configAllowableClosedloopError(0, 0, 10);
-		}
+		winch.configRemoteFeedbackFilter(Constants.kIsUsingCompBot ? Ports.ELEVATOR_3 : Ports.ELEVATOR_4, RemoteSensorSource.TalonSRX_SelectedSensor, 0, 10);
+		winch.configRemoteFeedbackFilter(Constants.kIsUsingCompBot ? Ports.ELEVATOR_3 : Ports.ELEVATOR_4, RemoteSensorSource.Off, 1, 10);
+		winch.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor0, 0, 10);
+		winch.setNeutralMode(NeutralMode.Brake);
+		winch.selectProfileSlot(0, 0);
+		winch.config_kP(0, 1.0, 10);
+		winch.config_kI(0, 0.0, 10);
+		winch.config_kD(0, 0.0, 10);
+		winch.config_kF(0, 0.0, 10);
+		winch.configAllowableClosedloopError(0, 0, 10);
 		
 		compressor = new Compressor(20);
 		
