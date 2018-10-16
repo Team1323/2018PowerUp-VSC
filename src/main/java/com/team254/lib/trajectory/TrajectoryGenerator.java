@@ -101,6 +101,16 @@ public class TrajectoryGenerator {
     public static final Pose2d kSecondRightCubePose = new Pose2d(new Translation2d(Constants.kRightSwitchFarCorner.x() + 3.0, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25),
         Rotation2d.fromDegrees(90.0));
 
+    //4 Cube Switch Auto?
+    public static final Pose2d kLeftSwitchScoringPose = new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - Constants.kRobotHalfLength - 4.0, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 1.0),
+        Rotation2d.fromDegrees(0.0));
+    public static final Pose2d kOuterCubeIntakingPose = new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (3*Constants.kCubeWidth) - 2.0, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.1),
+        Rotation2d.fromDegrees(0.0));
+    public static final Pose2d kMiddleCubeIntakingPose = new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.2),
+        Rotation2d.fromDegrees(0.0));
+    public static final Pose2d kBottomLeftIntakingPose = new Pose2d(new Translation2d(Constants.kLeftSwitchCloseCorner.x() - (2*Constants.kCubeWidth) - 1.5, Constants.kLeftSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 5.2),
+        Rotation2d.fromDegrees(90.0));
+
     public class TrajectorySet {
         public class MirroredTrajectory {
             public MirroredTrajectory(Trajectory<TimedState<Pose2dWithCurvature>> right) {
@@ -148,6 +158,9 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToDropoff;
         public final Trajectory<TimedState<Pose2dWithCurvature>> frontRightSwitchToBottomMiddle;
 
+        //4 Cube Left Switch
+        public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeFrontLeftSwitch;
+
         //Poof assist switch + scale
         public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToLeftScale;
         public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToRightScale;
@@ -158,18 +171,21 @@ public class TrajectoryGenerator {
         public final Trajectory<TimedState<Pose2dWithCurvature>> backOffLeftScale;
 
         private TrajectorySet() {
+            //Left Scale Mode
             startToLeftScale = getStartToLeftScale();
             alternateLeftmostCube = /*getAlternateLeftmostCube();*/convertPath(PathManager.mAlternateLeftmostCube, 3.8);
             derpLeftCubeToLeftScale = convertPath(PathManager.mDerpLeftCubeToLeftScale, 3.5);
             alternateLeftScaleToSecondCube = convertPath(PathManager.mAlternateLeftScaleToSecondCube, 4.7);
             alternateSecondLeftCubeToScale = convertPath(PathManager.mAlternateSecondLeftCubeToScale, 4.3);
 
+            //Right Scale Mode
             startToRightScale = generateTrajectory(false, convertWaypoints(PathManager.mStartToRightScale), Arrays.asList(new CurvatureVelocityConstraint()), 10.0, 10.0, 2.0, kMaxVoltage, 9.75, 3);
             rightScaleToFirstCube = convertPath(PathManager.mRightScaleToFirstCube, 3.75);
             alternateRightCubeToRightScale = convertPath(PathManager.mAlternateRightCubeToRightScale, 4.75);
             alternateRightScaleToSecondCube = convertPath(PathManager.mAlternateRightScaleToSecondCube, 5.5);
             secondCubeToRightScale = getSecondCubeToRightScale();
 
+            //Left Switch Mode
             frontLeftSwitch = convertPath(PathManager.mFrontLeftSwitch, 6.0);
             frontLeftSwitchToOuterCube = convertPath(PathManager.mFrontLeftSwitchToOuterCube, 5.75);
             outerCubeToFrontLeftSwitch = convertPath(PathManager.mOuterCubeToFrontLeftSwitch, 5.5);
@@ -178,6 +194,7 @@ public class TrajectoryGenerator {
             frontLeftSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
             frontLeftSwitchToBottomMiddle = convertPath(PathManager.mFrontLeftSwitchToBottomMiddle, 5.75);
 
+            //Right Switch Mode
             frontRightSwitch = convertPath(PathManager.mFrontRightSwitch, 6.75);
             frontRightSwitchToOuterCube = convertPath(PathManager.mFrontRightSwitchToOuterCube, 5.75);
             outerCubeToFrontRightSwitch = convertPath(PathManager.mOuterCubeToFrontRightSwitch, 5.5);
@@ -186,11 +203,16 @@ public class TrajectoryGenerator {
             frontRightSwitchToDropoff = convertPath(PathManager.mFrontLeftSwitchToDropoff, 2.0);
             frontRightSwitchToBottomMiddle = convertPath(PathManager.mFrontRightSwitchToBottomMiddle, 4.25);
 
+            //4 Cube Switch Mode?
+            fourCubeFrontLeftSwitch = getFourCubeFrontLeftSwitch();
+
+            //Switch + Scale Assist Modes
             middleCubeToLeftScale = getMiddleCubeToLeftScale();
             middleCubeToRightScale = getMiddleCubeToRightScale();
             alternateMiddleCubeToLeftScale = getAlternateMiddleCubeToLeftScale();
             alternateMiddleCubeToRightScale = getAlternateMiddleCubeToRightScale();
 
+            //Poof Assist Mode
             backOffLeftScale = getBackOffLeftScale();
         }
 
@@ -260,6 +282,14 @@ public class TrajectoryGenerator {
             waypoints.add(kLeftScaleScorePose.transformBy(Pose2d.fromTranslation(new Translation2d(-7.0, -0.5))));
 
             return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 6.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFourCubeFrontLeftSwitch(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(new Pose2d(Constants.kRobotStartingPose.getTranslation(), Rotation2d.fromDegrees(-60.0)));
+            waypoints.add(kLeftSwitchScoringPose);
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
         }
     }
     
