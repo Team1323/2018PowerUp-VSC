@@ -11,8 +11,6 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
-import com.team1323.frc2018.auto.modes.LLAssistMode;
-import com.team1323.frc2018.auto.modes.RightScaleMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -27,6 +25,7 @@ import com.team1323.frc2018.subsystems.Swerve;
 import com.team1323.frc2018.subsystems.Wrist;
 import com.team1323.io.Xbox;
 import com.team1323.lib.util.CrashTracker;
+import com.team1323.lib.util.InputRamp;
 import com.team1323.lib.util.Logger;
 import com.team1323.lib.util.Util;
 import com.team254.lib.geometry.Translation2d;
@@ -56,6 +55,7 @@ public class Robot extends IterativeRobot {
 	private SubsystemManager subsystems;
 	private Intake intake;
 	private Elevator elevator;
+	private InputRamp elevatorInput = new InputRamp(0.0, 1.0);
 	private Wrist wrist;
 	
 	private AutoModeExecuter autoModeExecuter = null;
@@ -67,6 +67,8 @@ public class Robot extends IterativeRobot {
 
 	private Looper enabledLooper = new Looper();
 	private Looper disabledLooper = new Looper();
+
+	private double timestamp;
 	
 	private RobotState robotState = RobotState.getInstance();
 	
@@ -205,6 +207,8 @@ public class Robot extends IterativeRobot {
 		try{
 			driver.update();
 			coDriver.update();
+
+			timestamp = Timer.getFPGATimestamp();
 			
 			if(oneControllerMode) oneControllerMode();
 			else twoControllerMode();
@@ -320,9 +324,9 @@ public class Robot extends IterativeRobot {
 		}
 					
 		if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
-			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft)*0.5);
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), elevatorInput.update(-coDriver.getY(Hand.kLeft)*0.5, timestamp));
 		else
-			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), -coDriver.getY(Hand.kLeft));
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), elevatorInput.update(-coDriver.getY(Hand.kLeft), timestamp));
 		
 		if(!superstructure.driveTrainFlipped()){
 			if(coDriver.aButton.wasPressed()){
