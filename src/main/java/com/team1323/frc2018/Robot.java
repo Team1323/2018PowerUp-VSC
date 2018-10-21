@@ -55,7 +55,7 @@ public class Robot extends IterativeRobot {
 	private SubsystemManager subsystems;
 	private Intake intake;
 	private Elevator elevator;
-	private InputRamp elevatorInput = new InputRamp(0.0, 1.0);
+	private InputRamp elevatorInput = new InputRamp(0.0, 1.0, 0.05);
 	private Wrist wrist;
 	
 	private AutoModeExecuter autoModeExecuter = null;
