@@ -160,6 +160,11 @@ public class TrajectoryGenerator {
 
         //4 Cube Left Switch
         public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeFrontLeftSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeFrontLeftToOuterCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeOuterToLeftSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeFrontLeftToMiddleCube;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeMiddleToLeftSwitch;
+        public final Trajectory<TimedState<Pose2dWithCurvature>> fourCubeFrontLeftToBottomLeft;
 
         //Poof assist switch + scale
         public final Trajectory<TimedState<Pose2dWithCurvature>> middleCubeToLeftScale;
@@ -205,6 +210,11 @@ public class TrajectoryGenerator {
 
             //4 Cube Switch Mode?
             fourCubeFrontLeftSwitch = getFourCubeFrontLeftSwitch();
+            fourCubeFrontLeftToOuterCube = getFourCubeFrontLeftToOuterCube();
+            fourCubeOuterToLeftSwitch = getFourCubeOuterToLeftSwitch();
+            fourCubeFrontLeftToMiddleCube = getFourCubeFrontLeftToMiddleCube();
+            fourCubeMiddleToLeftSwitch = getFourCubeMiddleToLeftSwitch();
+            fourCubeFrontLeftToBottomLeft = getFourCubeFrontLeftToBottomLeft();
 
             //Switch + Scale Assist Modes
             middleCubeToLeftScale = getMiddleCubeToLeftScale();
@@ -235,7 +245,7 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getSecondCubeToRightScale(){
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(kSecondRightCubePose);
-            waypoints.add(Pose2d.fromTranslation(new Translation2d(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength - 0.25, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 1.35)));
+            waypoints.add(Pose2d.fromTranslation(new Translation2d(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength - 0.25, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 1.5)));
             
             return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 6.0, 1);
         }
@@ -290,6 +300,46 @@ public class TrajectoryGenerator {
             waypoints.add(kLeftSwitchScoringPose);
 
             return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFourCubeFrontLeftToOuterCube(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kLeftSwitchScoringPose);
+            waypoints.add(kOuterCubeIntakingPose);
+
+            return generateTrajectory(true, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFourCubeOuterToLeftSwitch(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kOuterCubeIntakingPose);
+            waypoints.add(kLeftSwitchScoringPose);
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFourCubeFrontLeftToMiddleCube(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kLeftSwitchScoringPose);
+            waypoints.add(kMiddleCubeIntakingPose);
+
+            return generateTrajectory(true, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFourCubeMiddleToLeftSwitch(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kMiddleCubeIntakingPose);
+            waypoints.add(kLeftSwitchScoringPose);
+
+            return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
+        }
+
+        private Trajectory<TimedState<Pose2dWithCurvature>> getFourCubeFrontLeftToBottomLeft(){
+            List<Pose2d> waypoints = new ArrayList<>();
+            waypoints.add(kLeftSwitchScoringPose);
+            waypoints.add(kBottomLeftIntakingPose);
+
+            return generateTrajectory(true, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 5.0, 1);
         }
     }
     

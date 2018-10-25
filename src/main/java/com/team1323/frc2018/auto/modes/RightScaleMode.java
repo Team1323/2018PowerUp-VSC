@@ -62,7 +62,8 @@ public class RightScaleMode extends AutoModeBase{
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.rightScaleToFirstCube, -180.0, 1.0));
-		runAction(new WaitAction(0.75));
+		runAction(new WaitAction(0.65));
+		//runAction(new WaitForHeadingAction(-180.0, -80.0));
 		s.request(s.elevatorWristIntakeConfig(
 				Constants.kElevatorIntakingHeight, 
 				Constants.kWristIntakingAngle, 
@@ -85,7 +86,7 @@ public class RightScaleMode extends AutoModeBase{
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));//55.0
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(-0.3));
+		s.request(intake.ejectRequest(-0.4));//-0.3
 		System.out.println("Second cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.alternateRightScaleToSecondCube, -130.0, 0.5));//-135.0
@@ -106,14 +107,14 @@ public class RightScaleMode extends AutoModeBase{
 			runAction(new WaitToIntakeCubeAction(1.5));
 		}
 		System.out.println("Third Cube intaken at: " + (Timer.getFPGATimestamp() - startTime));
-		runAction(new SetTrajectoryAction(trajectories.secondCubeToRightScale, -40.0, 1.25));
+		runAction(new SetTrajectoryAction(trajectories.secondCubeToRightScale, -30.0, 1.25));
 		runAction(new WaitAction(0.25));
 		//s.request(Wrist.getInstance().angleRequest(Constants.kWristPrimaryStowAngle));
 		//runAction(new WaitToFinishPathAction());
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 65.0));//55.0
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(-0.3));
+		s.request(intake.ejectRequest(-0.4));
 		System.out.println("Third cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 	}
 

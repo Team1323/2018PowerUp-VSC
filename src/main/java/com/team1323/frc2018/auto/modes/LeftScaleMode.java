@@ -52,6 +52,7 @@ public class LeftScaleMode extends AutoModeBase{
 	@Override
 	protected void routine() throws AutoModeEndedException {
 		double startTime = Timer.getFPGATimestamp();
+		Constants.setLookaheadDistance(1.5);
 		runAction(new ResetPoseAction(Constants.kRobotLeftStartingPose));
 		s.request(intake.stateRequest(IntakeState.CLAMPING));
 		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 65.0, 0.5));//50.0
@@ -69,7 +70,8 @@ public class LeftScaleMode extends AutoModeBase{
 		s.request(s.elevatorWristIntakeConfig(
 				Constants.kElevatorIntakingHeight, 
 				Constants.kWristIntakingAngle, 
-				IntakeState.INTAKING_WIDE));
+				IntakeState.OPEN),
+				new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
 		runAction(new WaitForWallAction(3.0));
 		s.request(intake.stateRequest(IntakeState.INTAKING));
 		runAction(new WaitToIntakeCubeAction(1.0));

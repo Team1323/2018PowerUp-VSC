@@ -1,7 +1,10 @@
 package com.team1323.lib.util;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 public class InputRamp{
     double output = 0.0;
+    double lastInput = 0.0;
     double rampRate;
     double center;
     double lastTimestamp = 0.0;
@@ -30,21 +33,29 @@ public class InputRamp{
     }
 
     public double update(double input, double timestamp){
-        if(input == center && output != center && Math.abs(center - output) > deadband){
-            double direction = Math.signum(center - output);
+        double distance = Math.abs(input - center);
+        double lastDistance = Math.abs(lastInput - center);
+        if((input == center || distance < lastDistance) && output != center && Math.abs(center - output) > deadband){
+            double direction = Math.signum(input - output);
             if(!ramping){
                 rampDirection = direction;
                 ramping = true;
             }else if(direction != rampDirection){
                 return input;
             }
-            output += direction * ((timestamp - lastTimestamp) / rampRate);
+            output += (direction * ((timestamp - lastTimestamp) / rampRate));
         }else{
+            ramping = false;
             output = input;
         }
 
         lastTimestamp = timestamp;
+        lastInput = input;
 
+        return output;
+    }
+
+    public double getOutput(){
         return output;
     }
 }

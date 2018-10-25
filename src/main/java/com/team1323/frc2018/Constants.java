@@ -14,8 +14,8 @@ public class Constants {
 	
 	public static final double kEpsilon = 0.0001;
 	
-	public static final boolean kIsUsingCompBot = false;
-	public static final boolean kIsUsingTractionWheels = false;
+	public static final boolean kIsUsingCompBot = true;
+	public static final boolean kIsUsingTractionWheels = true;
 	public static final boolean kExtraNyooms = true;
 	
 	//Physical Robot Dimensions
@@ -70,7 +70,10 @@ public class Constants {
     
     //Path following constants
     public static final double kPathLookaheadTime = 0.25;  // seconds to look ahead along the path for steering 0.4
-    public static final double kPathMinLookaheadDistance = 0.25;  // feet 2.0
+	public static double kPathMinLookaheadDistance = 0.25;  // feet 2.0 (we've been using 0.25)
+	public static void setLookaheadDistance(double distance){
+		kPathMinLookaheadDistance = distance;
+	}
     
     //Swerve Speed Constants
     public static final double kSwerveDriveMaxSpeed = 5432.0;

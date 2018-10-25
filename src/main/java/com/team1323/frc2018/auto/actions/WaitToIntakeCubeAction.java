@@ -20,7 +20,7 @@ public class WaitToIntakeCubeAction implements Action{
 
 	@Override
 	public boolean isFinished() {
-		if(intake.hasCube() || intake.getBanner()){
+		if(intake.hasCube()){
 			System.out.println("Intake recognizes cube");
 			return true;
 		}else if((Timer.getFPGATimestamp() - startTime) > timeout){

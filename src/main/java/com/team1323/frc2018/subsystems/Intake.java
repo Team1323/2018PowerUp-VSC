@@ -188,7 +188,7 @@ public class Intake extends Subsystem{
 					if(Double.isInfinite(bannerSensorBeganTimestamp)){
 						bannerSensorBeganTimestamp = timestamp;
 					}else{
-						if(timestamp - bannerSensorBeganTimestamp > 0.25){
+						if(timestamp - bannerSensorBeganTimestamp > /*0.25*/0.1){
 							hasCube = true;
 							needsToNotifyDrivers = true;
 						}

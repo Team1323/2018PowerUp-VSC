@@ -120,6 +120,7 @@ public class Robot extends IterativeRobot {
 		subsystems.outputToSmartDashboard();
 		robotState.outputToSmartDashboard();
 		enabledLooper.outputToSmartDashboard();
+		SmartDashboard.putNumber("Elevator Output", elevatorInput.getOutput());
 	}
 
 	public void autoConfig(){

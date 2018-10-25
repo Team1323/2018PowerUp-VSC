@@ -4,6 +4,7 @@ import com.team1323.frc2018.auto.modes.LLAssistMode;
 import com.team1323.frc2018.auto.modes.LRAssistMode;
 import com.team1323.frc2018.auto.modes.LeftFrontSwitchMode;
 import com.team1323.frc2018.auto.modes.LeftScaleMode;
+import com.team1323.frc2018.auto.modes.LeftSwitchFourCubeMode;
 import com.team1323.frc2018.auto.modes.LeftSwitchLeftScaleMode;
 import com.team1323.frc2018.auto.modes.LeftSwitchRightScaleMode;
 import com.team1323.frc2018.auto.modes.RLAssistMode;
@@ -32,6 +33,7 @@ public class SmartDashboardInteractions {
     	modeChooser.addObject("Switch Only", AutoOption.SWITCH_ONLY);
 		//modeChooser.addObject("Scale Only", AutoOption.SCALE_ONLY);
 		modeChooser.addObject("2 Switch + 1 Scale", AutoOption.ASSIST);
+		modeChooser.addObject("Four Cube Switch (Test)", AutoOption.FOUR_CUBE_SWITCH);
     	
     	SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
@@ -50,7 +52,8 @@ public class SmartDashboardInteractions {
     
     enum AutoOption{
     	SWITCH_AND_SCALE("Switch and Scale (Deprecated)"),
-    	SWITCH_ONLY("Switch Only"),
+		SWITCH_ONLY("Switch Only"),
+		FOUR_CUBE_SWITCH("Four Cube Switch"),
 		SCALE_ONLY("Scale Only"),
 		ASSIST("Assist");
     	
@@ -123,6 +126,8 @@ public class SmartDashboardInteractions {
 					System.out.println("ERROR: unexpected auto mode: " + option);
 					return new StandStillMode();
 				}
+			case FOUR_CUBE_SWITCH:
+				return new LeftSwitchFourCubeMode();
             default:
                 System.out.println("ERROR: unexpected auto mode: " + option);
                 return new StandStillMode();
