@@ -35,7 +35,7 @@ public class InputRamp{
     public double update(double input, double timestamp){
         double distance = Math.abs(input - center);
         double lastDistance = Math.abs(lastInput - center);
-        if((input == center || distance < lastDistance) && output != center && Math.abs(center - output) > deadband){
+        if((input == center || distance < lastDistance) && output != input && Math.abs(input - output) > deadband){
             double direction = Math.signum(input - output);
             if(!ramping){
                 rampDirection = direction;

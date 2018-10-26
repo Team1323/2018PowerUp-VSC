@@ -34,6 +34,7 @@ public class WaitToIntakeCubeAction implements Action{
 	public void start() {
 		//TODO Turn on the intake or nah?
 		startTime = Timer.getFPGATimestamp();
+		s.queue(intake.stateRequest(IntakeState.INTAKING));
 	}
 
 	@Override

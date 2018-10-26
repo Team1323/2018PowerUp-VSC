@@ -111,7 +111,7 @@ public class Robot extends IterativeRobot {
 		swerve.zeroSensors();
 		
 		smartDashboardInteractions.initWithDefaults();
-		//initCamera();
+		initCamera();
 		
 		generator.generateTrajectories();		
 	}
@@ -232,10 +232,10 @@ public class Robot extends IterativeRobot {
 			elevator.fireLatch(false);
 			elevator.fireForks(false);
 
-			if(!pathsTransmitted){
+			/*if(!pathsTransmitted){
 				qTransmitter.addPaths(smartDashboardInteractions.getSelectedAutoMode(DriverStation.getInstance().getGameSpecificMessage().substring(0, 2)).getPaths());
 				pathsTransmitted = true;
-			}
+			}*/
 		}catch(Throwable t){
 			CrashTracker.logThrowableCrash(t);
 			throw t;
@@ -318,11 +318,11 @@ public class Robot extends IterativeRobot {
 			swerve.temporarilyDisableHeadingController();
 			swerve.zeroSensors(Constants.kRobotStartingPose);
 			swerve.resetAveragedDirection();
-		}else if(driver.rightTrigger.wasPressed()){
+		}/*else if(driver.rightTrigger.wasPressed()){
 			swerve.temporarilyDisableHeadingController();
 			swerve.zeroSensors(Constants.kRobotLeftStartingPose);
 			swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 0.75);
-		}
+		}*/
 					
 		if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
 			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), elevatorInput.update(-coDriver.getY(Hand.kLeft)*0.5, timestamp));

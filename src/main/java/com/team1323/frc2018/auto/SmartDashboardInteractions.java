@@ -33,7 +33,7 @@ public class SmartDashboardInteractions {
     	modeChooser.addObject("Switch Only", AutoOption.SWITCH_ONLY);
 		//modeChooser.addObject("Scale Only", AutoOption.SCALE_ONLY);
 		modeChooser.addObject("2 Switch + 1 Scale", AutoOption.ASSIST);
-		modeChooser.addObject("Four Cube Switch (Test)", AutoOption.FOUR_CUBE_SWITCH);
+		//modeChooser.addObject("Four Cube Switch (Test)", AutoOption.FOUR_CUBE_SWITCH);
     	
     	SmartDashboard.putData("Mode Chooser", modeChooser);
     	SmartDashboard.putString(SELECTED_AUTO_MODE, DEFAULT_MODE.name);
