@@ -54,7 +54,7 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new SetTrajectoryAction(trajectories.startToRightScale, -90.0, 0.75));
 		runAction(new WaitToPassYCoordinateAction(17.0));//15.0
 		s.request(s.elevatorWristConfig(Constants.kELevatorBalancedScaleHeight, 60.0));
-		//runAction(new WaitToPassYCoordinateAction(17.0));
+		runAction(new WaitToPassYCoordinateAction(17.75));
 		Swerve.getInstance().setAbsolutePathHeading(-40.0);
 		runAction(new WaitToFinishPathAction());
 		//runAction(new WaitForElevatorAction());

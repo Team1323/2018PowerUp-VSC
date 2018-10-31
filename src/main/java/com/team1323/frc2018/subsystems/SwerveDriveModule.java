@@ -26,6 +26,7 @@ public class SwerveDriveModule extends Subsystem{
 	int encoderOffset;
 	int encoderReverseFactor = 1;
 	boolean useDriveEncoder = true;
+	boolean tenVoltRotationMode = false;
 	private double previousEncDistance = 0;
 	private Rotation2d previousWheelAngle = new Rotation2d();
 	private Translation2d position;
@@ -92,11 +93,17 @@ public class SwerveDriveModule extends Subsystem{
     	rotationMotor.configAllowableClosedloopError(0, 0, 10);
     	rotationMotor.configMotionAcceleration((int)(Constants.kSwerveRotationMaxSpeed*12.5), 10);
     	rotationMotor.configMotionCruiseVelocity((int)(Constants.kSwerveRotationMaxSpeed), 10);
-    	rotationMotor.selectProfileSlot(0, 0);
+		rotationMotor.selectProfileSlot(0, 0);
+		//Slot 1 is for normal use
     	rotationMotor.config_kP(0, 6.0, 10);//4 8?
     	rotationMotor.config_kI(0, 0.0, 10);
     	rotationMotor.config_kD(0, 160.0, 10);//120 80?
-    	rotationMotor.config_kF(0, 1023.0/Constants.kSwerveRotationMaxSpeed, 10);
+		rotationMotor.config_kF(0, 1023.0/Constants.kSwerveRotationMaxSpeed, 10);
+		//Slot 2 is reserved for the beginning of auto
+		rotationMotor.config_kP(1, 8.0, 10);
+    	rotationMotor.config_kI(1, 0.0, 10);
+    	rotationMotor.config_kD(1, 200.0, 10);
+    	rotationMotor.config_kF(1, 1023.0/Constants.kSwerveRotation10VoltMaxSpeed, 10);
 		rotationMotor.set(ControlMode.MotionMagic, rotationMotor.getSelectedSensorPosition(0));
 		if(!isRotationSensorConnected())
 			DriverStation.reportError("Module " + moduleID + " rotation encoder not detected!", false);
@@ -117,7 +124,7 @@ public class SwerveDriveModule extends Subsystem{
     	driveMotor.setNeutralMode(NeutralMode.Brake);
     	// Slot 0 is reserved for MotionMagic
     	driveMotor.selectProfileSlot(0, 0);
-    	driveMotor.config_kP(0, 0.2, 10);
+    	driveMotor.config_kP(0, 2.0, 10);
     	driveMotor.config_kI(0, 0.0, 10);
     	driveMotor.config_kD(0, 24.0, 10);
     	driveMotor.config_kF(0, 1023.0/Constants.kSwerveDriveMaxSpeed, 10);
@@ -164,9 +171,21 @@ public class SwerveDriveModule extends Subsystem{
 	
 	public boolean angleOnTarget(){
 		double error = encUnitsToDegrees(Math.abs(periodicIO.rotationDemand - periodicIO.rotationPosition));
-		return error < 7.5;
+		return error < 2.0;
 	}
 	
+	public void set10VoltRotationMode(boolean tenVolts){
+		if(tenVolts && !tenVoltRotationMode){
+			rotationMotor.selectProfileSlot(1, 0);
+			rotationMotor.configVoltageCompSaturation(10.0, 10);
+			tenVoltRotationMode = true;
+		}else if(!tenVolts && tenVoltRotationMode){
+			rotationMotor.selectProfileSlot(0, 0);
+			rotationMotor.configVoltageCompSaturation(7.0, 10);
+			tenVoltRotationMode = false;
+		}
+	}
+
 	public void setRotationOpenLoop(double power){
 		periodicIO.rotationControlMode = ControlMode.PercentOutput;
 		periodicIO.rotationDemand = power;
@@ -335,11 +354,12 @@ public class SwerveDriveModule extends Subsystem{
 		SmartDashboard.putNumber(name + "Inches Driven", getDriveDistanceInches());
 		//SmartDashboard.putNumber(name + "Rotation Voltage", rotationMotor.getMotorOutputVoltage());
 		//SmartDashboard.putNumber(name + "Velocity", encVelocityToFeetPerSecond(periodicIO.velocity));
-		/*if(rotationMotor.getControlMode() == ControlMode.MotionMagic)
-			SmartDashboard.putNumber(name + "Error", encUnitsToDegrees(rotationMotor.getClosedLoopError(0)));*/
+		if(rotationMotor.getControlMode() == ControlMode.MotionMagic)
+			SmartDashboard.putNumber(name + "Error", encUnitsToDegrees(rotationMotor.getClosedLoopError(0)));
 		//SmartDashboard.putNumber(name + "X", position.x());
 		//SmartDashboard.putNumber(name + "Y", position.y());
 		//SmartDashboard.putNumber(name + "Drive Current", driveMotor.getOutputCurrent());
+		//SmartDashboard.putNumber(name + "Rotation Speed", rotationMotor.getSelectedSensorVelocity(0));
 	}
 
 	public static class PeriodicIO{

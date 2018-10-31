@@ -10,7 +10,7 @@ public class FrontRightSwitchToDropoffPath extends PathfinderPath{
 
 	public FrontRightSwitchToDropoffPath(){
 		super.points = new Waypoint[]{
-			new Waypoint(Constants.kRightSwitchCloseCorner.x() - Constants.kRobotHalfLength - 0.75, Constants.kRightSwitchCloseCorner.y() - Constants.kRobotHalfWidth - 0.5, Pathfinder.d2r(90)),
+			new Waypoint(Constants.kRightSwitchCloseCorner.x() - Constants.kRobotHalfLength - 1.05, Constants.kRightSwitchCloseCorner.y() - Constants.kRobotHalfWidth - 0.5, Pathfinder.d2r(90)),
 			new Waypoint(Constants.kRightSwitchCloseCorner.x() - Constants.kRobotHalfLength - 0.75, Constants.kRightSwitchCloseCorner.y() - Constants.kRobotHalfWidth + 0.5, Pathfinder.d2r(90)),
 			new Waypoint(Constants.kRightSwitchCloseCorner.x() + 3.0, Constants.kRightSwitchCloseCorner.y() + Constants.kRobotHalfWidth + 0.5, Pathfinder.d2r(0))
 		};

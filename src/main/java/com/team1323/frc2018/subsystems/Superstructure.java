@@ -176,6 +176,12 @@ public class Superstructure extends Subsystem{
 					}else if(intake.getState() != IntakeState.OPEN){
 						request(intake.stateRequest(IntakeState.OPEN));
 					}
+
+					if(elevatorHeight < (Constants.kElevatorMinimumHangingHeight + 0.25)){
+						elevator.setManualSpeed(0.25);
+					}else{
+						elevator.setManualSpeed(0.75);
+					}
 				}
 				
 				if(!activeRequestsCompleted){

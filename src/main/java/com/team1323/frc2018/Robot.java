@@ -11,6 +11,7 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
+import com.team1323.frc2018.auto.modes.LLAssistMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -29,9 +30,7 @@ import com.team1323.lib.util.InputRamp;
 import com.team1323.lib.util.Logger;
 import com.team1323.lib.util.Util;
 import com.team254.lib.geometry.Translation2d;
-import com.team254.lib.trajectory.TimedView;
 import com.team254.lib.trajectory.TrajectoryGenerator;
-import com.team254.lib.trajectory.TrajectoryIterator;
 
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
@@ -55,7 +54,7 @@ public class Robot extends IterativeRobot {
 	private SubsystemManager subsystems;
 	private Intake intake;
 	private Elevator elevator;
-	private InputRamp elevatorInput = new InputRamp(0.0, 1.0, 0.05);
+	private InputRamp elevatorInput = new InputRamp(0.0, 0.05, 0.05);
 	private Wrist wrist;
 	
 	private AutoModeExecuter autoModeExecuter = null;
@@ -114,6 +113,8 @@ public class Robot extends IterativeRobot {
 		initCamera();
 		
 		generator.generateTrajectories();		
+
+		qTransmitter.addPaths((new LLAssistMode()).getPaths());
 	}
 	
 	public void allPeriodic(){
@@ -127,6 +128,7 @@ public class Robot extends IterativeRobot {
 		swerve.zeroSensors();
 		swerve.setNominalDriveOutput(1.5);
 		swerve.requireModuleConfiguration();
+		swerve.set10VoltRotationMode(true);
 		transmitter.transmitCachedPaths();
 
 		superstructure.elevator.setCurrentLimit(15);
@@ -141,6 +143,7 @@ public class Robot extends IterativeRobot {
 	public void teleopConfig(){
 		superstructure.enableCompressor(true);
 		swerve.setNominalDriveOutput(0.0);
+		swerve.set10VoltRotationMode(false);
 		superstructure.elevator.setCurrentLimit(15);
 		superstructure.elevator.configForTeleopSpeed();
 		superstructure.intake.setHoldingOutput(Constants.kIntakeStrongHoldingOutput);
@@ -148,10 +151,10 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void initCamera(){
-    	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0);
+    	UsbCamera usbCamera = new UsbCamera("USB Camera 0", 0)/*CameraServer.getInstance().startAutomaticCapture()*/;
     	usbCamera.setVideoMode(PixelFormat.kMJPEG, 320, 240, 30);
     	MjpegServer mjpegServer2 = new MjpegServer("serve_Blur", 1182);
-    	mjpegServer2.setSource(usbCamera);
+		mjpegServer2.setSource(usbCamera);
 	}
 	
 	@Override
@@ -324,10 +327,13 @@ public class Robot extends IterativeRobot {
 			swerve.setTrajectory(new TrajectoryIterator<>(new TimedView<>(generator.getTrajectorySet().startToRightScale)), -90.0, 0.75);
 		}*/
 					
-		if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed())
+		if(superstructure.driveTrainFlipped() && coDriver.leftTrigger.isBeingPressed()){
 			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), elevatorInput.update(-coDriver.getY(Hand.kLeft)*0.5, timestamp));
-		else
+		}else if(superstructure.driveTrainFlipped()){
 			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), elevatorInput.update(-coDriver.getY(Hand.kLeft), timestamp));
+		}else{
+			superstructure.sendManualInput(-coDriver.getY(Hand.kRight), elevatorInput.update(-coDriver.getY(Hand.kLeft), timestamp));
+		}
 		
 		if(!superstructure.driveTrainFlipped()){
 			if(coDriver.aButton.wasPressed()){
@@ -401,6 +407,7 @@ public class Robot extends IterativeRobot {
 			superstructure.request(superstructure.elevatorWristIntakeConfig(Constants.kELevatorHangingHeight, 
 					Constants.kWristPrimaryStowAngle, IntakeState.OPEN),
 					new RequestList(elevator.gearShiftRequest(false)));
+			elevatorInput.setRampRate(0.75);
 		}else if(driver.POV180.wasPressed() && !elevator.isHighGear()){
 			//superstructure.request(elevator.lowGearHeightRequest(Constants.kElevatorMinimumHangingHeight));
 		}else if(driver.POV90.wasPressed() && !elevator.isHighGear()){

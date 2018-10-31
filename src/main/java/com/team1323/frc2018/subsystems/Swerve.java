@@ -77,6 +77,7 @@ public class Swerve extends Subsystem{
 	Rotation2d lastSteeringDirection;
 	boolean modulesReady = false;
 	boolean alwaysConfigureModules = false;
+	boolean moduleConfigRequested = false;
 	public void requireModuleConfiguration(){
 		modulesReady = false;
 	}
@@ -261,6 +262,10 @@ public class Swerve extends Subsystem{
 		modules.forEach((m) -> m.setModuleAngle(directionDegrees));
 		modules.forEach((m) -> m.setDrivePositionTarget(magnitudeInches));
 	}
+
+	public void lockDrivePosition(){
+		modules.forEach((m) -> m.setDrivePositionTarget(0.0));
+	}
 	
 	public void setDriveOutput(List<Translation2d> driveVectors){
 		for(int i=0; i<modules.size(); i++){
@@ -278,12 +283,16 @@ public class Swerve extends Subsystem{
 		for(int i=0; i<modules.size(); i++){
     		if(Util.shouldReverse(driveVectors.get(i).direction().getDegrees(), modules.get(i).getModuleAngle().getDegrees())){
     			modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees() + 180.0);
-    			modules.get(i).setDriveOpenLoop(0.0);
+    			//modules.get(i).setDriveOpenLoop(0.0);
     		}else{
     			modules.get(i).setModuleAngle(driveVectors.get(i).direction().getDegrees());
-    			modules.get(i).setDriveOpenLoop(0.0);
+    			//modules.get(i).setDriveOpenLoop(0.0);
     		}
     	}
+	}
+
+	public void set10VoltRotationMode(boolean tenVolts){
+		modules.forEach((m) -> m.set10VoltRotationMode(tenVolts));
 	}
 	
 	public boolean positionOnTarget(){
@@ -318,6 +327,7 @@ public class Swerve extends Subsystem{
 	public synchronized void setTrajectory(TrajectoryIterator<TimedState<Pose2dWithCurvature>> trajectory, double targetHeading,
 		double rotationScalar, Translation2d followingCenter){
 			hasFinishedPath = false;
+			moduleConfigRequested = false;
 			motionPlanner.reset();
 			motionPlanner.setTrajectory(trajectory);
 			motionPlanner.setFollowingCenter(followingCenter);
@@ -607,14 +617,19 @@ public class Swerve extends Subsystem{
 				Translation2d driveVector = motionPlanner.update(timestamp, pose);
 				if(Util.epsilonEquals(driveVector.norm(), 0.0, Constants.kEpsilon))
 					driveVector = lastActiveVector;
-				if(modulesReady)
+				if(modulesReady){
 					setDriveOutput(inverseKinematics.updateDriveVectors(driveVector, 
 						Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.01), pose, false));
-				else
+				}else if(!moduleConfigRequested){
+					set10VoltRotationMode(true);
+					//lockDrivePosition();
 					setModuleAngles(inverseKinematics.updateDriveVectors(driveVector, 
-					Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.01), pose, false));
+						Util.deadBand(rotationCorrection*rotationScalar*driveVector.norm(), 0.01), pose, false));
+					moduleConfigRequested = true;
+				}
 
 				if(moduleAnglesOnTarget() && !modulesReady){
+					set10VoltRotationMode(false);
 					modules.forEach((m) -> m.resetLastEncoderReading());
 					modulesReady = true;
 					System.out.println("Modules Ready");

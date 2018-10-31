@@ -54,7 +54,7 @@ public class LeftScaleMode extends AutoModeBase{
 		double startTime = Timer.getFPGATimestamp();
 		Constants.setLookaheadDistance(1.5);
 		runAction(new ResetPoseAction(Constants.kRobotLeftStartingPose));
-		s.request(intake.stateRequest(IntakeState.CLAMPING));
+		//s.request(intake.stateRequest(IntakeState.CLAMPING));
 		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 65.0, 0.5));//50.0
 		Swerve.getInstance().alwaysConfigureModules();
 		Elevator.getInstance().configForTeleopSpeed();
@@ -99,7 +99,7 @@ public class LeftScaleMode extends AutoModeBase{
 			Constants.kElevatorIntakingHeight, 
 			Constants.kWristIntakingAngle, 
 			IntakeState.OPEN),
-			new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
+			new RequestList(intake.stateRequest(IntakeState.INTAKING)));
 		runAction(new WaitToFinishPathAction());
 		s.request(intake.stateRequest(IntakeState.INTAKING));
 		runAction(new WaitToIntakeCubeAction(0.75));

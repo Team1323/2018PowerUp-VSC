@@ -70,7 +70,7 @@ public class Constants {
     
     //Path following constants
     public static final double kPathLookaheadTime = 0.25;  // seconds to look ahead along the path for steering 0.4
-	public static double kPathMinLookaheadDistance = 0.25;  // feet 2.0 (we've been using 0.25)
+	public static double kPathMinLookaheadDistance = 0.5;  // feet 2.0 (we've been using 0.25)
 	public static void setLookaheadDistance(double distance){
 		kPathMinLookaheadDistance = distance;
 	}
@@ -78,7 +78,8 @@ public class Constants {
     //Swerve Speed Constants
     public static final double kSwerveDriveMaxSpeed = 5432.0;
     public static final double kSwerveMaxSpeedFeetPerSecond = 12.5;
-    public static final double kSwerveRotationMaxSpeed = 1250.0 * 0.8; //The 0.8 is to request a speed that is always achievable
+	public static final double kSwerveRotationMaxSpeed = 1250.0 * 0.8; //The 0.8 is to request a speed that is always achievable
+	public static final double kSwerveRotation10VoltMaxSpeed = 1350.0;
     public static final double kSwerveRotationSpeedScalar = ((1.0 / 0.125) - 1.0) / kSwerveMaxSpeedFeetPerSecond;
     
     //Swerve Module Wheel Offsets (Rotation encoder values when the wheels are facing 0 degrees)
@@ -127,8 +128,8 @@ public class Constants {
 	public static final double kElevatorTicksPerFoot = 11983.0 / 2.5989583; //determined empirically
 	public static final double kElevatorHeightTolerance = 0.1; //feet
 	public static final double kElevatorIntakingHeight = kIsUsingCompBot ? 0.2 : 0.125; //feet
-	public static final double kElevatorSecondCubeHeight = 0.97;
-	public static final double kElevatorHumanLoadHeight = 1.836;
+	public static final double kElevatorSecondCubeHeight = 0.97 + 0.1;
+	public static final double kElevatorHumanLoadHeight = 1.836 + 0.1;
 	public static final double kElevatorSwitchHeight = 2.0; //feet
 	public static final double kELevatorBalancedScaleHeight = 5.05; //feet
 	public static final double kElevatorHighScaleHeight = 5.3;
@@ -138,7 +139,7 @@ public class Constants {
 	public static final double kElevatorMaxHeight = 5.4; //feet
 	public static final double kElevatorMaxCurrent = 50.0;//amps
 	public static final int kELevatorCurrentLimit = 20;
-	public static final double kElevatorMinimumHangingHeight = 0.795;
+	public static final double kElevatorMinimumHangingHeight = 0.795 + 0.08;
 	public static final double kElevatorMaximumHangingHeight = 3.25;
 	public static final double kElevatorHangingRampHeight = 3.452;
 	public static final double kElevatorTippingCubeHeight = 0.57;

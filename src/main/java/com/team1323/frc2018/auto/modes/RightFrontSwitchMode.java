@@ -34,7 +34,7 @@ public class RightFrontSwitchMode extends AutoModeBase{
 
 	private List<Trajectory<TimedState<Pose2dWithCurvature>>> paths = Arrays.asList(trajectories.frontRightSwitch,
 		trajectories.frontRightSwitchToOuterCube, trajectories.outerCubeToFrontRightSwitch, trajectories.frontRightSwitchToMiddleCube,
-		trajectories.middleCubeToFrontRightSwitch, trajectories.frontRightSwitchToBottomMiddle);
+		trajectories.middleCubeToFrontRightSwitch, trajectories.frontRightSwitchToDropoff);
 
 	@Override
 	public List<Trajectory<TimedState<Pose2dWithCurvature>>> getPaths(){
