@@ -98,7 +98,7 @@ public class TrajectoryGenerator {
     public static final Pose2d kLeftScaleScorePose = new Pose2d(new Translation2d(22.75, Constants.kLeftSwitchCloseCorner.y() - Constants.kRobotHalfLength - 1.0),
         Rotation2d.fromDegrees(0.0));
 
-    public static final Pose2d kSecondRightCubePose = new Pose2d(new Translation2d(Constants.kRightSwitchFarCorner.x() + 3.0, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25),
+    public static final Pose2d kSecondRightCubePose = new Pose2d(new Translation2d(Constants.kRightSwitchFarCorner.x() + /*3.0*/1.1, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25 - 1.0),
         Rotation2d.fromDegrees(90.0));
 
     //4 Cube Switch Auto?
@@ -244,7 +244,7 @@ public class TrajectoryGenerator {
         private Trajectory<TimedState<Pose2dWithCurvature>> getSecondCubeToRightScale(){
             List<Pose2d> waypoints = new ArrayList<>();
             waypoints.add(kSecondRightCubePose);
-            waypoints.add(Pose2d.fromTranslation(new Translation2d(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength + 0.05, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 1.75)));
+            waypoints.add(Pose2d.fromTranslation(new Translation2d(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength + 0.05 - 2.0, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 1.75 - 1.0)));
             
             return generateTrajectory(false, waypoints, Arrays.asList(), 10.0, 10.0, 6.0, kMaxVoltage, 6.0, 1);
         }

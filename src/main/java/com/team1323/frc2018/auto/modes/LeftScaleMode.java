@@ -58,7 +58,7 @@ public class LeftScaleMode extends AutoModeBase{
 		runAction(new SetTrajectoryAction(trajectories.startToLeftScale, 65.0, 0.5));//50.0
 		Swerve.getInstance().alwaysConfigureModules();
 		Elevator.getInstance().configForTeleopSpeed();
-		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x()));
+		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x() - 1.0));
 		s.request(s.elevatorWristConfig(4.5, 66.0));//66.0
 		runAction(new WaitToFinishPathAction());
 		s.request(intake.ejectRequest(-0.53));

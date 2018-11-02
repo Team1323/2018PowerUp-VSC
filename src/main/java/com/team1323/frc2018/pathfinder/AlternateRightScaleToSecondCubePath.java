@@ -8,8 +8,8 @@ import jaci.pathfinder.Waypoint;
 public class AlternateRightScaleToSecondCubePath extends PathfinderPath{
 	public AlternateRightScaleToSecondCubePath(){
 		super.points = new Waypoint[]{
-			new Waypoint(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength - 0.25, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 2.5, Pathfinder.d2r(180)),
-			new Waypoint(Constants.kRightSwitchFarCorner.x() + 3.0, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25, Pathfinder.d2r(-90.0))
+			new Waypoint(Constants.kRightScaleCorner.x() - Constants.kRobotHalfLength - /*0.25*/2.5, Constants.kRightScaleCorner.y() + Constants.kRobotHalfWidth + 2.5 - 1.0, Pathfinder.d2r(180)),
+			new Waypoint(Constants.kRightSwitchFarCorner.x() + /*3.0*/1.1, Constants.kRightSwitchFarCorner.y() + Constants.kRobotHalfLength - 3.25 - 1.0, Pathfinder.d2r(-90.0))
 		};//3.9 -2.5
 		super.maxAccel = 5.0;
 		super.defaultSpeed = 4.5;
