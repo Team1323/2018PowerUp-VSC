@@ -9,8 +9,8 @@ public class AlternateSecondLeftCubeToScalePath extends PathfinderPath{
 
 	public AlternateSecondLeftCubeToScalePath(){
 		super.points = new Waypoint[]{
-			new Waypoint(Constants.kLeftSwitchFarCorner.x() + 2.1 - 2.25, Constants.kLeftSwitchFarCorner.y() + 3.0, Pathfinder.d2r(-75)),
-			new Waypoint(22.75 - 1.5, 5.75, Pathfinder.d2r(0)),
+			new Waypoint(Constants.kLeftSwitchFarCorner.x() + 2.1, Constants.kLeftSwitchFarCorner.y() + 3.0, Pathfinder.d2r(-75)),
+			new Waypoint(22.75, 5.75, Pathfinder.d2r(0)),
 		};
 		super.maxAccel = 5.0;
 		super.defaultSpeed = 4.5;

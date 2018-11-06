@@ -10,7 +10,7 @@ import com.team1323.frc2018.auto.actions.DriveStraightAction;
 import com.team1323.frc2018.auto.actions.ResetPoseAction;
 import com.team1323.frc2018.auto.actions.SetTrajectoryAction;
 import com.team1323.frc2018.auto.actions.WaitAction;
-import com.team1323.frc2018.auto.actions.WaitForHeadingAction;
+import com.team1323.frc2018.auto.actions.WaitForElevatorAction;
 import com.team1323.frc2018.auto.actions.WaitForWallAction;
 import com.team1323.frc2018.auto.actions.WaitToFinishPathAction;
 import com.team1323.frc2018.auto.actions.WaitToIntakeCubeAction;
@@ -57,7 +57,7 @@ public class RightScaleMode extends AutoModeBase{
 		runAction(new WaitToPassYCoordinateAction(17.75));
 		Swerve.getInstance().setAbsolutePathHeading(-40.0);
 		runAction(new WaitToFinishPathAction());
-		//runAction(new WaitForElevatorAction());
+		runAction(new WaitForElevatorAction());
 		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
