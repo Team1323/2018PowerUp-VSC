@@ -99,7 +99,7 @@ public class LeftScaleMode extends AutoModeBase{
 			Constants.kElevatorIntakingHeight, 
 			Constants.kWristIntakingAngle, 
 			IntakeState.OPEN),
-			new RequestList(intake.stateRequest(IntakeState.INTAKING)));
+			new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
 		runAction(new WaitToFinishPathAction());
 		s.request(intake.stateRequest(IntakeState.INTAKING));
 		runAction(new WaitToIntakeCubeAction(0.75));

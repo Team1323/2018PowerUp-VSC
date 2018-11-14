@@ -60,7 +60,7 @@ public class LeftFrontSwitchMode extends AutoModeBase{
 		runAction(new WaitAction(0.5));
 		s.request(s.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 75.0));
 		runAction(new WaitToFinishPathAction());
-		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		s.request(intake.ejectRequest(-0.5));
 		System.out.println("First Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.frontLeftSwitchToOuterCube, 0.0, 1.0));
@@ -82,7 +82,7 @@ public class LeftFrontSwitchMode extends AutoModeBase{
 		runAction(new WaitAction(0.5));
 		s.request(s.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 85.0));
 		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x() - Constants.kRobotHalfLength - 1.0));
-		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		s.request(intake.ejectRequest(-0.5));
 		System.out.println("Second Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.frontLeftSwitchToMiddleCube, 0.0, 1.0));

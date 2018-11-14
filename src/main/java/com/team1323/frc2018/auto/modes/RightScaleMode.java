@@ -58,7 +58,7 @@ public class RightScaleMode extends AutoModeBase{
 		Swerve.getInstance().setAbsolutePathHeading(-40.0);
 		runAction(new WaitToFinishPathAction());
 		runAction(new WaitForElevatorAction());
-		s.request(intake.ejectRequest(Constants.kIntakeWeakEjectOutput));
+		s.request(intake.ejectRequest(-0.5));//-0.4
 		System.out.println("First cube scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.rightScaleToFirstCube, -180.0, 1.0));

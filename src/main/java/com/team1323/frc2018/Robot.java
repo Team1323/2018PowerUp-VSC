@@ -11,7 +11,8 @@ import java.util.Arrays;
 
 import com.team1323.frc2018.auto.AutoModeExecuter;
 import com.team1323.frc2018.auto.SmartDashboardInteractions;
-import com.team1323.frc2018.auto.modes.RightScaleMode;
+import com.team1323.frc2018.auto.modes.LeftScaleMode;
+import com.team1323.frc2018.auto.modes.StandStillMode;
 import com.team1323.frc2018.loops.Looper;
 import com.team1323.frc2018.loops.PathTransmitter;
 import com.team1323.frc2018.loops.QuinticPathTransmitter;
@@ -114,7 +115,7 @@ public class Robot extends IterativeRobot {
 		
 		generator.generateTrajectories();		
 
-		qTransmitter.addPaths((new RightScaleMode()).getPaths());
+		qTransmitter.addPaths((new LeftScaleMode()).getPaths());
 	}
 	
 	public void allPeriodic(){
@@ -173,6 +174,7 @@ public class Robot extends IterativeRobot {
 			String gameData = DriverStation.getInstance().getGameSpecificMessage();
 			autoModeExecuter = new AutoModeExecuter();
 			autoModeExecuter.setAutoMode(smartDashboardInteractions.getSelectedAutoMode(gameData.substring(0, 2)));
+			//autoModeExecuter.setAutoMode(new StandStillMode());
 			autoModeExecuter.start();
 			SmartDashboard.putString("Game Data", gameData);
 			System.out.println(gameData);
@@ -379,7 +381,7 @@ public class Robot extends IterativeRobot {
 						Constants.kElevatorIntakingHeight, 
 						Constants.kWristIntakingAngle, 
 						IntakeState.OFF),
-						new RequestList(intake.stateRequest(IntakeState.INTAKING_WIDE)));
+						new RequestList(intake.stateRequest(IntakeState.OPEN)));
 			}
 		}else{
 			if(coDriver.POV0.isBeingPressed()){

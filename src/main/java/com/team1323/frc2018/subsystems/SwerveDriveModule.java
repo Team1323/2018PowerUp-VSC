@@ -171,7 +171,7 @@ public class SwerveDriveModule extends Subsystem{
 	
 	public boolean angleOnTarget(){
 		double error = encUnitsToDegrees(Math.abs(periodicIO.rotationDemand - periodicIO.rotationPosition));
-		return error < 2.0;
+		return error < 4.5;
 	}
 	
 	public void set10VoltRotationMode(boolean tenVolts){

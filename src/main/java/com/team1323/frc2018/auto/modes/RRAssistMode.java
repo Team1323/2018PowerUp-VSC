@@ -50,11 +50,11 @@ public class RRAssistMode extends AutoModeBase{
 		double startTime = Timer.getFPGATimestamp();
 		runAction(new ResetPoseAction(Constants.kRobotStartingPose.transformBy(Pose2d.fromTranslation(new Translation2d(/*-0.25*/0.0, 0.0)))));
 		s.request(intake.stateRequest(IntakeState.CLAMPING));
-		runAction(new SetTrajectoryAction(trajectories.frontRightSwitch, 0.0, 1.0));
+		runAction(new SetTrajectoryAction(trajectories.frontRightSwitch, 1.0, 1.0));
 		runAction(new WaitAction(0.5));
 		s.request(s.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 75.0));
 		runAction(new WaitToFinishPathAction());
-		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		s.request(intake.ejectRequest(-0.5));
 		System.out.println("First Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.frontRightSwitchToOuterCube, 0.0, 1.0));
@@ -77,7 +77,7 @@ public class RRAssistMode extends AutoModeBase{
 		runAction(new WaitAction(0.5));
 		s.request(s.elevatorWristConfig(Constants.kElevatorSecondCubeHeight, 75.0));
 		runAction(new WaitToPassXCoordinateAction(Constants.kLeftSwitchCloseCorner.x() - Constants.kRobotHalfLength - 0.75));
-		s.request(intake.ejectRequest(Constants.kIntakeEjectOutput));
+		s.request(intake.ejectRequest(-0.5));
 		System.out.println("Second Cube Scored at: " + (Timer.getFPGATimestamp() - startTime));
 		runAction(new WaitAction(0.25));
 		runAction(new SetTrajectoryAction(trajectories.frontRightSwitchToMiddleCube, 0.0, 1.0));
@@ -96,7 +96,7 @@ public class RRAssistMode extends AutoModeBase{
 			runAction(new WaitToIntakeCubeAction(1.0));
 		}
         System.out.println("Third Cube Intaken at: " + (Timer.getFPGATimestamp() - startTime));
-        runAction(new SetTrajectoryAction(trajectories.middleCubeToRightScale, -90.0, 0.5));
+        runAction(new SetTrajectoryAction(trajectories.middleCubeToRightScale, -95.0, 0.5));
         runAction(new WaitAction(0.5));
         s.request(s.wristIntakeConfig(Constants.kWristPrimaryStowAngle, IntakeState.CLAMPING));
         runAction(new WaitToPassXCoordinateAction(Constants.kRightSwitchFarCorner.x() - 1.5));
